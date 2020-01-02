@@ -49,7 +49,6 @@ import org.apache.commons.math3.util.FastMath;
  * functions can safely be ported to Commons-Math.
  * </p>
  *
- * @version $Id$
  */
 public class Gamma {
     /**
@@ -330,11 +329,11 @@ public class Gamma {
                    n < maxIterations &&
                    sum < Double.POSITIVE_INFINITY) {
                 // compute next element in the series
-                n = n + 1.0;
-                an = an * (x / (a + n));
+                n += 1.0;
+                an *= x / (a + n);
 
                 // update partial sum
-                sum = sum + an;
+                sum += an;
             }
             if (n >= maxIterations) {
                 throw new MaxCountExceededException(maxIterations);
@@ -403,11 +402,13 @@ public class Gamma {
             // create continued fraction
             ContinuedFraction cf = new ContinuedFraction() {
 
+                /** {@inheritDoc} */
                 @Override
                 protected double getA(int n, double x) {
                     return ((2.0 * n) + 1.0) - a + x;
                 }
 
+                /** {@inheritDoc} */
                 @Override
                 protected double getB(int n, double x) {
                     return n * (a - n);
@@ -443,6 +444,10 @@ public class Gamma {
      * @since 2.0
      */
     public static double digamma(double x) {
+        if (Double.isNaN(x) || Double.isInfinite(x)) {
+            return x;
+        }
+
         if (x > 0 && x <= S_LIMIT) {
             // use method 5 from Bernardo AS103
             // accurate to O(x)
@@ -473,6 +478,10 @@ public class Gamma {
      * @since 2.0
      */
     public static double trigamma(double x) {
+        if (Double.isNaN(x) || Double.isInfinite(x)) {
+            return x;
+        }
+
         if (x > 0 && x <= S_LIMIT) {
             return 1 / (x * x);
         }
@@ -512,7 +521,7 @@ public class Gamma {
     public static double lanczos(final double x) {
         double sum = 0.0;
         for (int i = LANCZOS.length - 1; i > 0; --i) {
-            sum = sum + (LANCZOS[i] / (x + i));
+            sum += LANCZOS[i] / (x + i);
         }
         return sum + LANCZOS[0];
     }
@@ -666,7 +675,7 @@ public class Gamma {
                 double prod = 1.0;
                 double t = x;
                 while (t > 2.5) {
-                    t = t - 1.0;
+                    t -= 1.0;
                     prod *= t;
                 }
                 ret = prod / (1.0 + invGamma1pm1(t - 1.0));
@@ -681,14 +690,14 @@ public class Gamma {
                 double prod = x;
                 double t = x;
                 while (t < -0.5) {
-                    t = t + 1.0;
+                    t += 1.0;
                     prod *= t;
                 }
                 ret = 1.0 / (prod * (1.0 + invGamma1pm1(t)));
             }
         } else {
             final double y = absX + LANCZOS_G + 0.5;
-            final double gammaAbs = SQRT_TWO_PI / x *
+            final double gammaAbs = SQRT_TWO_PI / absX *
                                     FastMath.pow(y, absX + 0.5) *
                                     FastMath.exp(-y) * lanczos(absX);
             if (x > 0.0) {

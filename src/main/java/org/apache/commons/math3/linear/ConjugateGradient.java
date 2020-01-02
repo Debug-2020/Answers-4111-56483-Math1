@@ -73,7 +73,6 @@ import org.apache.commons.math3.util.IterationManager;
  * Numerical Analysis 13: 56-80, 2002</dd>
  * </dl>
  *
- * @version $Id$
  * @since 3.0
  */
 public class ConjugateGradient
@@ -151,7 +150,7 @@ public class ConjugateGradient
                                    final RealVector x0)
         throws NullArgumentException, NonPositiveDefiniteOperatorException,
         NonSquareOperatorException, DimensionMismatchException,
-        MaxCountExceededException, NonPositiveDefiniteOperatorException {
+        MaxCountExceededException {
         checkParameters(a, m, b, x0);
         final IterationManager manager = getIterationManager();
         // Initialization of default stopping criterion

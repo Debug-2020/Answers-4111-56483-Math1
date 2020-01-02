@@ -18,6 +18,7 @@ package org.apache.commons.math3.geometry.euclidean.threed;
 
 import java.util.ArrayList;
 
+import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.euclidean.twod.Euclidean2D;
 import org.apache.commons.math3.geometry.euclidean.twod.PolygonsSet;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
@@ -32,7 +33,6 @@ import org.apache.commons.math3.util.FastMath;
 /** Extractor for {@link PolygonsSet polyhedrons sets} outlines.
  * <p>This class extracts the 2D outlines from {{@link PolygonsSet
  * polyhedrons sets} in a specified projection plane.</p>
- * @version $Id$
  * @since 3.0
  */
 public class OutlineExtractor {
@@ -63,7 +63,7 @@ public class OutlineExtractor {
     public Vector2D[][] getOutline(final PolyhedronsSet polyhedronsSet) {
 
         // project all boundary facets into one polygons set
-        final BoundaryProjector projector = new BoundaryProjector();
+        final BoundaryProjector projector = new BoundaryProjector(polyhedronsSet.getTolerance());
         polyhedronsSet.getTree(true).visit(projector);
         final PolygonsSet projected = projector.getProjected();
 
@@ -96,13 +96,13 @@ public class OutlineExtractor {
 
     }
 
-    /** Check if a point is geometrically between its neighbour in an array.
-     * <p>The neighbours are computed considering the array is a loop
+    /** Check if a point is geometrically between its neighbor in an array.
+     * <p>The neighbors are computed considering the array is a loop
      * (i.e. point at index (n-1) is before point at index 0)</p>
      * @param loop points array
      * @param n number of points to consider in the array
      * @param i index of the point to check (must be between 0 and n-1)
-     * @return true if the point is exactly between its neighbours
+     * @return true if the point is exactly between its neighbors
      */
     private boolean pointIsBetween(final Vector2D[] loop, final int n, final int i) {
         final Vector2D previous = loop[(i + n - 1) % n];
@@ -124,10 +124,15 @@ public class OutlineExtractor {
         /** Projection of the polyhedrons set on the plane. */
         private PolygonsSet projected;
 
+        /** Tolerance below which points are considered identical. */
+        private final double tolerance;
+
         /** Simple constructor.
+         * @param tolerance tolerance below which points are considered identical
          */
-        public BoundaryProjector() {
-            projected = new PolygonsSet(new BSPTree<Euclidean2D>(Boolean.FALSE));
+        BoundaryProjector(final double tolerance) {
+            this.projected = new PolygonsSet(new BSPTree<Euclidean2D>(Boolean.FALSE), tolerance);
+            this.tolerance = tolerance;
         }
 
         /** {@inheritDoc} */
@@ -199,17 +204,17 @@ public class OutlineExtractor {
                 for (Vector2D[] loop : vertices) {
                     final boolean closed = loop[0] != null;
                     int previous         = closed ? (loop.length - 1) : 1;
-                    Vector3D previous3D  = plane.toSpace(loop[previous]);
+                    Vector3D previous3D  = plane.toSpace((Point<Euclidean2D>) loop[previous]);
                     int current          = (previous + 1) % loop.length;
                     Vector2D pPoint       = new Vector2D(previous3D.dotProduct(u),
                                                          previous3D.dotProduct(v));
                     while (current < loop.length) {
 
-                        final Vector3D current3D = plane.toSpace(loop[current]);
+                        final Vector3D current3D = plane.toSpace((Point<Euclidean2D>) loop[current]);
                         final Vector2D  cPoint    = new Vector2D(current3D.dotProduct(u),
                                                                  current3D.dotProduct(v));
                         final org.apache.commons.math3.geometry.euclidean.twod.Line line =
-                            new org.apache.commons.math3.geometry.euclidean.twod.Line(pPoint, cPoint);
+                            new org.apache.commons.math3.geometry.euclidean.twod.Line(pPoint, cPoint, tolerance);
                         SubHyperplane<Euclidean2D> edge = line.wholeHyperplane();
 
                         if (closed || (previous != 1)) {
@@ -217,7 +222,7 @@ public class OutlineExtractor {
                             // it defines one bounding point of the edge
                             final double angle = line.getAngle() + 0.5 * FastMath.PI;
                             final org.apache.commons.math3.geometry.euclidean.twod.Line l =
-                                new org.apache.commons.math3.geometry.euclidean.twod.Line(pPoint, angle);
+                                new org.apache.commons.math3.geometry.euclidean.twod.Line(pPoint, angle, tolerance);
                             edge = edge.split(l).getPlus();
                         }
 
@@ -226,7 +231,7 @@ public class OutlineExtractor {
                             // it defines one bounding point of the edge
                             final double angle = line.getAngle() + 0.5 * FastMath.PI;
                             final org.apache.commons.math3.geometry.euclidean.twod.Line l =
-                                new org.apache.commons.math3.geometry.euclidean.twod.Line(cPoint, angle);
+                                new org.apache.commons.math3.geometry.euclidean.twod.Line(cPoint, angle, tolerance);
                             edge = edge.split(l).getMinus();
                         }
 
@@ -238,7 +243,7 @@ public class OutlineExtractor {
 
                     }
                 }
-                final PolygonsSet projectedFacet = new PolygonsSet(edges);
+                final PolygonsSet projectedFacet = new PolygonsSet(edges, tolerance);
 
                 // add the contribution of the facet to the global outline
                 projected = (PolygonsSet) new RegionFactory<Euclidean2D>().union(projected, projectedFacet);

@@ -30,7 +30,6 @@ import org.apache.commons.math3.exception.TooManyIterationsException;
  * @param <PAIR> Type of the point/value pair returned by the optimization
  * algorithm.
  *
- * @version $Id$
  * @since 3.1
  */
 public abstract class BaseOptimizer<PAIR> {
@@ -115,15 +114,15 @@ public abstract class BaseOptimizer<PAIR> {
 
     /**
      * Stores data and performs the optimization.
-     * <br/>
+     * <p>
      * The list of parameters is open-ended so that sub-classes can extend it
      * with arguments specific to their concrete implementations.
-     * <br/>
+     * <p>
      * When the method is called multiple times, instance data is overwritten
      * only when actually present in the list of arguments: when not specified,
      * data set in a previous call is retained (and thus is optional in
      * subsequent calls).
-     * <br/>
+     * <p>
      * Important note: Subclasses <em>must</em> override
      * {@link #parseOptimizationData(OptimizationData[])} if they need to register
      * their own options; but then, they <em>must</em> also call
@@ -135,7 +134,7 @@ public abstract class BaseOptimizer<PAIR> {
      *  <li>{@link MaxEval}</li>
      *  <li>{@link MaxIter}</li>
      * </ul>
-     * @return a point/value pair that satifies the convergence criteria.
+     * @return a point/value pair that satisfies the convergence criteria.
      * @throws TooManyEvaluationsException if the maximal number of
      * evaluations is exceeded.
      * @throws TooManyIterationsException if the maximal number of
@@ -157,7 +156,7 @@ public abstract class BaseOptimizer<PAIR> {
     /**
      * Performs the optimization.
      *
-     * @return a point/value pair that satifies the convergence criteria.
+     * @return a point/value pair that satisfies the convergence criteria.
      * @throws TooManyEvaluationsException if the maximal number of
      * evaluations is exceeded.
      * @throws TooManyIterationsException if the maximal number of

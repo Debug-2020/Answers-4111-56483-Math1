@@ -16,10 +16,10 @@
  */
 package org.apache.commons.math3.geometry.euclidean.twod;
 
+import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.util.FastMath;
 
 /** Simple container for a two-points segment.
- * @version $Id$
  * @since 3.0
  */
 public class Segment {
@@ -27,7 +27,7 @@ public class Segment {
     /** Start point of the segment. */
     private final Vector2D start;
 
-    /** End point of the segments. */
+    /** End point of the segment. */
     private final Vector2D end;
 
     /** Line containing the segment. */
@@ -95,8 +95,8 @@ public class Segment {
 
         // if point isn't on the line segment, just return the shortest distance to the end points
         if (r < 0 || r > 1) {
-            final double dist1 = getStart().distance(p);
-            final double dist2 = getEnd().distance(p);
+            final double dist1 = getStart().distance((Point<Euclidean2D>) p);
+            final double dist2 = getEnd().distance((Point<Euclidean2D>) p);
 
             return FastMath.min(dist1, dist2);
         }
@@ -106,7 +106,7 @@ public class Segment {
             final double py = start.getY() + r * deltaY;
 
             final Vector2D interPt = new Vector2D(px, py);
-            return interPt.distance(p);
+            return interPt.distance((Point<Euclidean2D>) p);
         }
     }
 }

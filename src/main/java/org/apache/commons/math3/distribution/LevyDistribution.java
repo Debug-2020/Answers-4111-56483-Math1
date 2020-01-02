@@ -18,6 +18,7 @@ package org.apache.commons.math3.distribution;
 
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.random.Well19937c;
 import org.apache.commons.math3.special.Erf;
 import org.apache.commons.math3.util.FastMath;
 
@@ -25,7 +26,6 @@ import org.apache.commons.math3.util.FastMath;
  * This class implements the <a href="http://en.wikipedia.org/wiki/L%C3%A9vy_distribution">
  * L&eacute;vy distribution</a>.
  *
- * @version $Id$
  * @since 3.2
  */
 public class LevyDistribution extends AbstractRealDistribution {
@@ -41,6 +41,24 @@ public class LevyDistribution extends AbstractRealDistribution {
 
     /** Half of c (for calculations). */
     private final double halfC;
+
+    /**
+     * Build a new instance.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
+     *
+     * @param mu location parameter
+     * @param c scale parameter
+     * @since 3.4
+     */
+    public LevyDistribution(final double mu, final double c) {
+        this(new Well19937c(), mu, c);
+    }
 
     /**
      * Creates a LevyDistribution.
@@ -77,6 +95,21 @@ public class LevyDistribution extends AbstractRealDistribution {
         final double delta = x - mu;
         final double f     = halfC / delta;
         return FastMath.sqrt(f / FastMath.PI) * FastMath.exp(-f) /delta;
+    }
+
+    /** {@inheritDoc}
+     *
+     * See documentation of {@link #density(double)} for computation details.
+     */
+    @Override
+    public double logDensity(double x) {
+        if (x < mu) {
+            return Double.NaN;
+        }
+
+        final double delta = x - mu;
+        final double f     = halfC / delta;
+        return 0.5 * FastMath.log(f / FastMath.PI) - f - FastMath.log(delta);
     }
 
     /** {@inheritDoc}

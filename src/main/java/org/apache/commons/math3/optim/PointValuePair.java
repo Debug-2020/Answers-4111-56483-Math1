@@ -25,7 +25,6 @@ import org.apache.commons.math3.util.Pair;
  *
  * @see PointVectorValuePair
  * @see org.apache.commons.math3.analysis.MultivariateFunction
- * @version $Id$
  * @since 3.0
  */
 public class PointValuePair extends Pair<double[], Double> implements Serializable {
@@ -107,7 +106,7 @@ public class PointValuePair extends Pair<double[], Double> implements Serializab
          * @param point Point coordinates.
          * @param value Value of the objective function at the point.
          */
-        public DataTransferObject(final double[] point, final double value) {
+        DataTransferObject(final double[] point, final double value) {
             this.point = point.clone();
             this.value = value;
         }

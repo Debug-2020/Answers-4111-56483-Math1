@@ -21,7 +21,6 @@ import java.io.PrintStream;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 
 /** Class used to compute the classical functions tables.
- * @version $Id$
  * @since 3.0
  */
 class FastMathCalc {
@@ -424,7 +423,7 @@ class FastMathCalc {
             double err = 1.0 - result[0] * in[0] - result[0] * in[1] -
             result[1] * in[0] - result[1] * in[1];
             /*err = 1.0 - err; */
-            err = err * (result[0] + result[1]);
+            err *= result[0] + result[1];
             /*printf("err = %16e\n", err); */
             result[1] += err;
         }
@@ -453,10 +452,10 @@ class FastMathCalc {
         splitMult(xs, ys, zs);
 
         double tmp = result[0] + zs[0];
-        result[1] = result[1] - (tmp - result[0] - zs[0]);
+        result[1] -= tmp - result[0] - zs[0];
         result[0] = tmp;
         tmp = result[0] + zs[1];
-        result[1] = result[1] - (tmp - result[0] - zs[1]);
+        result[1] -= tmp - result[0] - zs[1];
         result[0] = tmp;
 
         /* a[1] * b[0] */
@@ -465,10 +464,10 @@ class FastMathCalc {
         splitMult(xs, ys, zs);
 
         tmp = result[0] + zs[0];
-        result[1] = result[1] - (tmp - result[0] - zs[0]);
+        result[1] -= tmp - result[0] - zs[0];
         result[0] = tmp;
         tmp = result[0] + zs[1];
-        result[1] = result[1] - (tmp - result[0] - zs[1]);
+        result[1] -= tmp - result[0] - zs[1];
         result[0] = tmp;
 
         /* a[1] * b[0] */
@@ -477,10 +476,10 @@ class FastMathCalc {
         splitMult(xs, ys, zs);
 
         tmp = result[0] + zs[0];
-        result[1] = result[1] - (tmp - result[0] - zs[0]);
+        result[1] -= tmp - result[0] - zs[0];
         result[0] = tmp;
         tmp = result[0] + zs[1];
-        result[1] = result[1] - (tmp - result[0] - zs[1]);
+        result[1] -= tmp - result[0] - zs[1];
         result[0] = tmp;
     }
 

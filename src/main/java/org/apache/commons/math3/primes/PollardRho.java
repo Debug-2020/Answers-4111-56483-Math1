@@ -23,7 +23,6 @@ import org.apache.commons.math3.util.FastMath;
 
 /**
  * Implementation of the Pollard's rho factorization algorithm.
- * @version $Id$
  * @since 3.2
  */
 class PollardRho {
@@ -107,7 +106,7 @@ class PollardRho {
                 if (1 != out) {
                     return out;
                 }
-                k = k + m;
+                k += m;
             } while (k < r);
             r = 2 * r;
         } while (true);

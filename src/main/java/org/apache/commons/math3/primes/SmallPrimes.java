@@ -25,7 +25,6 @@ import org.apache.commons.math3.util.FastMath;
 
 /**
  * Utility methods to work on primes within the <code>int</code> range.
- * @version $Id$
  * @since 3.2
  */
 class SmallPrimes {
@@ -83,7 +82,7 @@ class SmallPrimes {
     public static int smallTrialDivision(int n, final List<Integer> factors) {
         for (int p : PRIMES) {
             while (0 == n % p) {
-                n = n / p;
+                n /= p;
                 factors.add(p);
             }
         }
@@ -102,13 +101,13 @@ class SmallPrimes {
         // no check is done about n >= f
         while (f <= maxFactor) {
             if (0 == n % f) {
-                n = n / f;
+                n /= f;
                 factors.add(f);
                 break;
             }
             f += 4;
             if (0 == n % f) {
-                n = n / f;
+                n /= f;
                 factors.add(f);
                 break;
             }

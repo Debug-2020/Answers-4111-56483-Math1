@@ -31,7 +31,6 @@ import org.apache.commons.math3.exception.NumberIsTooSmallException;
  * be wrapped into the initial range before being passed to the class that
  * actually computes the interpolation.
  *
- * @version $Id$
  */
 public class UnivariatePeriodicInterpolator
     implements UnivariateInterpolator {
@@ -116,6 +115,7 @@ public class UnivariatePeriodicInterpolator
 
         final UnivariateFunction f = interpolator.interpolate(x, y);
         return new UnivariateFunction() {
+            /** {@inheritDoc} */
             public double value(final double x) throws MathIllegalArgumentException {
                 return f.value(MathUtils.reduce(x, period, offset));
             }

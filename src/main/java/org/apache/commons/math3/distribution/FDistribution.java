@@ -19,17 +19,16 @@ package org.apache.commons.math3.distribution;
 
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.special.Beta;
-import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
+import org.apache.commons.math3.special.Beta;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Implementation of the F-distribution.
  *
  * @see <a href="http://en.wikipedia.org/wiki/F-distribution">F-distribution (Wikipedia)</a>
  * @see <a href="http://mathworld.wolfram.com/F-Distribution.html">F-distribution (MathWorld)</a>
- * @version $Id$
  */
 public class FDistribution extends AbstractRealDistribution {
     /**
@@ -52,6 +51,13 @@ public class FDistribution extends AbstractRealDistribution {
 
     /**
      * Creates an F distribution using the given degrees of freedom.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param numeratorDegreesOfFreedom Numerator degrees of freedom.
      * @param denominatorDegreesOfFreedom Denominator degrees of freedom.
@@ -69,6 +75,13 @@ public class FDistribution extends AbstractRealDistribution {
     /**
      * Creates an F distribution using the given degrees of freedom
      * and inverse cumulative probability accuracy.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param numeratorDegreesOfFreedom Numerator degrees of freedom.
      * @param denominatorDegreesOfFreedom Denominator degrees of freedom.
@@ -93,10 +106,26 @@ public class FDistribution extends AbstractRealDistribution {
      * @param rng Random number generator.
      * @param numeratorDegreesOfFreedom Numerator degrees of freedom.
      * @param denominatorDegreesOfFreedom Denominator degrees of freedom.
+     * @throws NotStrictlyPositiveException if {@code numeratorDegreesOfFreedom <= 0} or
+     * {@code denominatorDegreesOfFreedom <= 0}.
+     * @since 3.3
+     */
+    public FDistribution(RandomGenerator rng,
+                         double numeratorDegreesOfFreedom,
+                         double denominatorDegreesOfFreedom)
+        throws NotStrictlyPositiveException {
+        this(rng, numeratorDegreesOfFreedom, denominatorDegreesOfFreedom, DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
+    }
+
+    /**
+     * Creates an F distribution.
+     *
+     * @param rng Random number generator.
+     * @param numeratorDegreesOfFreedom Numerator degrees of freedom.
+     * @param denominatorDegreesOfFreedom Denominator degrees of freedom.
      * @param inverseCumAccuracy the maximum absolute error in inverse
      * cumulative probability estimates.
-     * @throws NotStrictlyPositiveException if
-     * {@code numeratorDegreesOfFreedom <= 0} or
+     * @throws NotStrictlyPositiveException if {@code numeratorDegreesOfFreedom <= 0} or
      * {@code denominatorDegreesOfFreedom <= 0}.
      * @since 3.1
      */
@@ -126,16 +155,22 @@ public class FDistribution extends AbstractRealDistribution {
      * @since 2.1
      */
     public double density(double x) {
+        return FastMath.exp(logDensity(x));
+    }
+
+    /** {@inheritDoc} **/
+    @Override
+    public double logDensity(double x) {
         final double nhalf = numeratorDegreesOfFreedom / 2;
         final double mhalf = denominatorDegreesOfFreedom / 2;
         final double logx = FastMath.log(x);
         final double logn = FastMath.log(numeratorDegreesOfFreedom);
         final double logm = FastMath.log(denominatorDegreesOfFreedom);
         final double lognxm = FastMath.log(numeratorDegreesOfFreedom * x +
-                                           denominatorDegreesOfFreedom);
-        return FastMath.exp(nhalf * logn + nhalf * logx - logx +
-                            mhalf * logm - nhalf * lognxm - mhalf * lognxm -
-                            Beta.logBeta(nhalf, mhalf));
+                denominatorDegreesOfFreedom);
+        return nhalf * logn + nhalf * logx - logx +
+               mhalf * logm - nhalf * lognxm - mhalf * lognxm -
+               Beta.logBeta(nhalf, mhalf);
     }
 
     /**

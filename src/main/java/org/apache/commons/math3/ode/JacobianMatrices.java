@@ -51,7 +51,6 @@ import org.apache.commons.math3.exception.util.LocalizedFormats;
  * @see ParameterJacobianProvider
  * @see ParameterizedODE
  *
- * @version $Id$
  * @since 3.0
  */
 public class JacobianMatrices {
@@ -429,12 +428,11 @@ public class JacobianMatrices {
         /** Wrap a {@link FirstOrderDifferentialEquations} into a {@link MainStateJacobianProvider}.
          * @param ode original ODE problem, without jacobians computation skill
          * @param hY step sizes to compute the jacobian df/dy
-         * @see JacobianMatrices#setMainStateSteps(double[])
          * @exception DimensionMismatchException if there is a dimension mismatch between
          * the steps array {@code hY} and the equation dimension
          */
-        public MainStateJacobianWrapper(final FirstOrderDifferentialEquations ode,
-                                        final double[] hY)
+        MainStateJacobianWrapper(final FirstOrderDifferentialEquations ode,
+                                 final double[] hY)
             throws DimensionMismatchException {
             this.ode = ode;
             this.hY = hY.clone();

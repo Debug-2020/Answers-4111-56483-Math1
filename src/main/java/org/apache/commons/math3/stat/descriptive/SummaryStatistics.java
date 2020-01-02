@@ -56,7 +56,6 @@ import org.apache.commons.math3.util.FastMath;
  * {@link SynchronizedSummaryStatistics} if concurrent access from multiple
  * threads is required.
  * </p>
- * @version $Id$
  */
 public class SummaryStatistics implements StatisticalSummary, Serializable {
 
@@ -226,6 +225,18 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
     }
 
     /**
+     * Returns the quadratic mean, a.k.a.
+     * <a href="http://mathworld.wolfram.com/Root-Mean-Square.html">
+     * root-mean-square</a> of the available values
+     * @return The quadratic mean or {@code Double.NaN} if no values
+     * have been added.
+     */
+    public double getQuadraticMean() {
+        final long size = getN();
+        return size > 0 ? FastMath.sqrt(getSumsq() / size) : Double.NaN;
+    }
+
+    /**
      * Returns the (sample) variance of the available values.
      *
      * <p>This method returns the bias-corrected sample variance (using {@code n - 1} in
@@ -328,10 +339,13 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
         outBuffer.append("n: ").append(getN()).append(endl);
         outBuffer.append("min: ").append(getMin()).append(endl);
         outBuffer.append("max: ").append(getMax()).append(endl);
+        outBuffer.append("sum: ").append(getSum()).append(endl);
         outBuffer.append("mean: ").append(getMean()).append(endl);
         outBuffer.append("geometric mean: ").append(getGeometricMean())
             .append(endl);
         outBuffer.append("variance: ").append(getVariance()).append(endl);
+        outBuffer.append("population variance: ").append(getPopulationVariance()).append(endl);
+        outBuffer.append("second moment: ").append(getSecondMoment()).append(endl);
         outBuffer.append("sum of squares: ").append(getSumsq()).append(endl);
         outBuffer.append("standard deviation: ").append(getStandardDeviation())
             .append(endl);
@@ -418,9 +432,10 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
      * Sets the implementation for the Sum.
      * </p>
      * <p>
-     * This method must be activated before any data has been added - i.e.,
-     * before {@link #addValue(double) addValue} has been used to add data;
-     * otherwise an IllegalStateException will be thrown.
+     * This method cannot be activated after data has been added - i.e.,
+     * after {@link #addValue(double) addValue} has been used to add data.
+     * If it is activated after data has been added, an IllegalStateException
+     * will be thrown.
      * </p>
      * @param sumImpl the StorelessUnivariateStatistic instance to use for
      *        computing the Sum
@@ -447,9 +462,10 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
      * Sets the implementation for the sum of squares.
      * </p>
      * <p>
-     * This method must be activated before any data has been added - i.e.,
-     * before {@link #addValue(double) addValue} has been used to add data;
-     * otherwise an IllegalStateException will be thrown.
+     * This method cannot be activated after data has been added - i.e.,
+     * after {@link #addValue(double) addValue} has been used to add data.
+     * If it is activated after data has been added, an IllegalStateException
+     * will be thrown.
      * </p>
      * @param sumsqImpl the StorelessUnivariateStatistic instance to use for
      *        computing the sum of squares
@@ -476,9 +492,10 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
      * Sets the implementation for the minimum.
      * </p>
      * <p>
-     * This method must be activated before any data has been added - i.e.,
-     * before {@link #addValue(double) addValue} has been used to add data;
-     * otherwise an IllegalStateException will be thrown.
+     * This method cannot be activated after data has been added - i.e.,
+     * after {@link #addValue(double) addValue} has been used to add data.
+     * If it is activated after data has been added, an IllegalStateException
+     * will be thrown.
      * </p>
      * @param minImpl the StorelessUnivariateStatistic instance to use for
      *        computing the minimum
@@ -505,9 +522,10 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
      * Sets the implementation for the maximum.
      * </p>
      * <p>
-     * This method must be activated before any data has been added - i.e.,
-     * before {@link #addValue(double) addValue} has been used to add data;
-     * otherwise an IllegalStateException will be thrown.
+     * This method cannot be activated after data has been added - i.e.,
+     * after {@link #addValue(double) addValue} has been used to add data.
+     * If it is activated after data has been added, an IllegalStateException
+     * will be thrown.
      * </p>
      * @param maxImpl the StorelessUnivariateStatistic instance to use for
      *        computing the maximum
@@ -534,9 +552,10 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
      * Sets the implementation for the sum of logs.
      * </p>
      * <p>
-     * This method must be activated before any data has been added - i.e.,
-     * before {@link #addValue(double) addValue} has been used to add data;
-     * otherwise an IllegalStateException will be thrown.
+     * This method cannot be activated after data has been added - i.e.,
+     * after {@link #addValue(double) addValue} has been used to add data.
+     * If it is activated after data has been added, an IllegalStateException
+     * will be thrown.
      * </p>
      * @param sumLogImpl the StorelessUnivariateStatistic instance to use for
      *        computing the log sum
@@ -564,9 +583,10 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
      * Sets the implementation for the geometric mean.
      * </p>
      * <p>
-     * This method must be activated before any data has been added - i.e.,
-     * before {@link #addValue(double) addValue} has been used to add data;
-     * otherwise an IllegalStateException will be thrown.
+     * This method cannot be activated after data has been added - i.e.,
+     * after {@link #addValue(double) addValue} has been used to add data.
+     * If it is activated after data has been added, an IllegalStateException
+     * will be thrown.
      * </p>
      * @param geoMeanImpl the StorelessUnivariateStatistic instance to use for
      *        computing the geometric mean
@@ -593,9 +613,10 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
      * Sets the implementation for the mean.
      * </p>
      * <p>
-     * This method must be activated before any data has been added - i.e.,
-     * before {@link #addValue(double) addValue} has been used to add data;
-     * otherwise an IllegalStateException will be thrown.
+     * This method cannot be activated after data has been added - i.e.,
+     * after {@link #addValue(double) addValue} has been used to add data.
+     * If it is activated after data has been added, an IllegalStateException
+     * will be thrown.
      * </p>
      * @param meanImpl the StorelessUnivariateStatistic instance to use for
      *        computing the mean
@@ -622,9 +643,10 @@ public class SummaryStatistics implements StatisticalSummary, Serializable {
      * Sets the implementation for the variance.
      * </p>
      * <p>
-     * This method must be activated before any data has been added - i.e.,
-     * before {@link #addValue(double) addValue} has been used to add data;
-     * otherwise an IllegalStateException will be thrown.
+     * This method cannot be activated after data has been added - i.e.,
+     * after {@link #addValue(double) addValue} has been used to add data.
+     * If it is activated after data has been added, an IllegalStateException
+     * will be thrown.
      * </p>
      * @param varianceImpl the StorelessUnivariateStatistic instance to use for
      *        computing the variance

@@ -29,7 +29,6 @@ import org.apache.commons.math3.exception.NullArgumentException;
  * into a primitive double or to turn a String representation of a Number into
  * a double.
  *
- * @version $Id$
  */
 public class DefaultTransformer implements NumberTransformer, Serializable {
 
@@ -56,7 +55,7 @@ public class DefaultTransformer implements NumberTransformer, Serializable {
         }
 
         try {
-            return Double.valueOf(o.toString()).doubleValue();
+            return Double.parseDouble(o.toString());
         } catch (NumberFormatException e) {
             throw new MathIllegalArgumentException(LocalizedFormats.CANNOT_TRANSFORM_TO_DOUBLE,
                                                    o.toString());

@@ -20,6 +20,7 @@ import java.text.NumberFormat;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
+import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.Space;
 import org.apache.commons.math3.geometry.Vector;
 import org.apache.commons.math3.util.FastMath;
@@ -27,7 +28,6 @@ import org.apache.commons.math3.util.MathUtils;
 
 /** This class represents a 1D vector.
  * <p>Instances of this class are guaranteed to be immutable.</p>
- * @version $Id$
  * @since 3.0
  */
 public class Vector1D implements Vector<Euclidean1D> {
@@ -217,8 +217,16 @@ public class Vector1D implements Vector<Euclidean1D> {
         return dx;
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc}
+     * @deprecated as of 3.3, replaced with {@link #distance(Point)}
+     */
+    @Deprecated
     public double distance(Vector<Euclidean1D> p) {
+        return distance((Point<Euclidean1D>) p);
+    }
+
+    /** {@inheritDoc} */
+    public double distance(Point<Euclidean1D> p) {
         Vector1D p3 = (Vector1D) p;
         final double dx = p3.x - x;
         return FastMath.abs(dx);

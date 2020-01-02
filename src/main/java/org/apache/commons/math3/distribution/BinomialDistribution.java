@@ -16,20 +16,19 @@
  */
 package org.apache.commons.math3.distribution;
 
-import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.NotPositiveException;
+import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.special.Beta;
-import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
+import org.apache.commons.math3.special.Beta;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Implementation of the binomial distribution.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Binomial_distribution">Binomial distribution (Wikipedia)</a>
  * @see <a href="http://mathworld.wolfram.com/BinomialDistribution.html">Binomial Distribution (MathWorld)</a>
- * @version $Id$
  */
 public class BinomialDistribution extends AbstractIntegerDistribution {
     /** Serializable version identifier. */
@@ -42,6 +41,13 @@ public class BinomialDistribution extends AbstractIntegerDistribution {
     /**
      * Create a binomial distribution with the given number of trials and
      * probability of success.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param trials Number of trials.
      * @param p Probability of success.
@@ -99,13 +105,23 @@ public class BinomialDistribution extends AbstractIntegerDistribution {
 
     /** {@inheritDoc} */
     public double probability(int x) {
+        final double logProbability = logProbability(x);
+        return logProbability == Double.NEGATIVE_INFINITY ? 0 : FastMath.exp(logProbability);
+    }
+
+    /** {@inheritDoc} **/
+    @Override
+    public double logProbability(int x) {
+        if (numberOfTrials == 0) {
+            return (x == 0) ? 0. : Double.NEGATIVE_INFINITY;
+        }
         double ret;
         if (x < 0 || x > numberOfTrials) {
-            ret = 0.0;
+            ret = Double.NEGATIVE_INFINITY;
         } else {
-            ret = FastMath.exp(SaddlePointExpansion.logBinomialProbability(x,
+            ret = SaddlePointExpansion.logBinomialProbability(x,
                     numberOfTrials, probabilityOfSuccess,
-                    1.0 - probabilityOfSuccess));
+                    1.0 - probabilityOfSuccess);
         }
         return ret;
     }

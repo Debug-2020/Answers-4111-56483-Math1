@@ -37,7 +37,6 @@ import org.apache.commons.math3.linear.RealMatrix;
  * <p>Note: the underlying covariance matrix is symmetric, thus only the
  * upper triangular part of the matrix is stored and updated each increment.</p>
  *
- * @version $Id$
  * @since 3.0
  */
 public class StorelessCovariance extends Covariance {
@@ -170,6 +169,7 @@ public class StorelessCovariance extends Covariance {
      *
      * @param sc externally computed StorelessCovariance to add to this
      * @throws DimensionMismatchException if the dimension of sc does not match this
+     * @since 3.3
      */
     public void append(StorelessCovariance sc) throws DimensionMismatchException {
         if (sc.dimension != dimension) {

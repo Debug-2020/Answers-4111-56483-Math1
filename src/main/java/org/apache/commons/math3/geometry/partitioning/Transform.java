@@ -16,7 +16,7 @@
  */
 package org.apache.commons.math3.geometry.partitioning;
 
-import org.apache.commons.math3.geometry.Vector;
+import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.Space;
 
 
@@ -30,7 +30,7 @@ import org.apache.commons.math3.geometry.Space;
  * <ul>
  *   <li>
  *     the transform can be applied to a point in the
- *     D-dimension space using its {@link #apply(Vector)}
+ *     D-dimension space using its {@link #apply(Point)}
  *     method
  *   </li>
  *   <li>
@@ -49,7 +49,6 @@ import org.apache.commons.math3.geometry.Space;
  * @param <S> Type of the embedding space.
  * @param <T> Type of the embedded sub-space.
 
- * @version $Id$
  * @since 3.0
  */
 public interface Transform<S extends Space, T extends Space> {
@@ -58,7 +57,7 @@ public interface Transform<S extends Space, T extends Space> {
      * @param point point to transform
      * @return a new object representing the transformed point
      */
-    Vector<S> apply(Vector<S> point);
+    Point<S> apply(Point<S> point);
 
     /** Transform an hyperplane of a space.
      * @param hyperplane hyperplane to transform

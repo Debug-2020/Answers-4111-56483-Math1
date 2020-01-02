@@ -38,7 +38,6 @@ import org.apache.commons.math3.util.MathArrays;
  * but provided by one sample, or when the hypothesis under test is that the two
  * samples come from the same underlying distribution.</p>
  *
- * @version $Id$
  * @since 3.1
  */
 public class GTest {
@@ -95,7 +94,7 @@ public class GTest {
         }
         double ratio = 1d;
         boolean rescale = false;
-        if (Math.abs(sumExpected - sumObserved) > 10E-6) {
+        if (FastMath.abs(sumExpected - sumObserved) > 10E-6) {
             ratio = sumObserved / sumExpected;
             rescale = true;
         }
@@ -153,10 +152,10 @@ public class GTest {
             throws NotPositiveException, NotStrictlyPositiveException,
             DimensionMismatchException, MaxCountExceededException {
 
+        // pass a null rng to avoid unneeded overhead as we will not sample from this distribution
         final ChiSquaredDistribution distribution =
-                new ChiSquaredDistribution(expected.length - 1.0);
-        return 1.0 - distribution.cumulativeProbability(
-                g(expected, observed));
+                new ChiSquaredDistribution(null, expected.length - 1.0);
+        return 1.0 - distribution.cumulativeProbability(g(expected, observed));
     }
 
     /**
@@ -184,10 +183,10 @@ public class GTest {
             throws NotPositiveException, NotStrictlyPositiveException,
             DimensionMismatchException, MaxCountExceededException {
 
+        // pass a null rng to avoid unneeded overhead as we will not sample from this distribution
         final ChiSquaredDistribution distribution =
-                new ChiSquaredDistribution(expected.length - 2.0);
-        return 1.0 - distribution.cumulativeProbability(
-                g(expected, observed));
+                new ChiSquaredDistribution(null, expected.length - 2.0);
+        return 1.0 - distribution.cumulativeProbability(g(expected, observed));
     }
 
     /**
@@ -270,7 +269,7 @@ public class GTest {
             for (int j = 0; j < k[i].length; j++) {
                 if (k[i][j] != 0) {
                     final double p_ij = (double) k[i][j] / sum_k;
-                    h += p_ij * Math.log(p_ij);
+                    h += p_ij * FastMath.log(p_ij);
                 }
             }
         }
@@ -297,7 +296,7 @@ public class GTest {
         for (int i = 0; i < k.length; i++) {
             if (k[i] != 0) {
                 final double p_i = (double) k[i] / sum_k;
-                h += p_i * Math.log(p_i);
+                h += p_i * FastMath.log(p_i);
             }
         }
         return -h;
@@ -473,8 +472,10 @@ public class GTest {
             final long[] observed2)
             throws DimensionMismatchException, NotPositiveException, ZeroException,
             MaxCountExceededException {
-        final ChiSquaredDistribution distribution = new ChiSquaredDistribution(
-                (double) observed1.length - 1);
+
+        // pass a null rng to avoid unneeded overhead as we will not sample from this distribution
+        final ChiSquaredDistribution distribution =
+                new ChiSquaredDistribution(null, (double) observed1.length - 1);
         return 1 - distribution.cumulativeProbability(
                 gDataSetsComparison(observed1, observed2));
     }

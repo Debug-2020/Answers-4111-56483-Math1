@@ -59,7 +59,6 @@ import org.apache.commons.math3.util.Precision;
  * a1: Artificial variable</br>
  * RHS: Right hand side</br>
  * </p>
- * @version $Id$
  * @deprecated As of 3.1 (to be removed in 4.0).
  * @since 2.0
  */
@@ -249,7 +248,7 @@ class SimplexTableau implements Serializable {
      * @return new versions of the constraints
      */
     public List<LinearConstraint> normalizeConstraints(Collection<LinearConstraint> originalConstraints) {
-        List<LinearConstraint> normalized = new ArrayList<LinearConstraint>();
+        List<LinearConstraint> normalized = new ArrayList<LinearConstraint>(originalConstraints.size());
         for (LinearConstraint constraint : originalConstraints) {
             normalized.add(normalize(constraint));
         }
@@ -576,6 +575,7 @@ class SimplexTableau implements Serializable {
         return tableau.getData();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object other) {
 
@@ -598,6 +598,7 @@ class SimplexTableau implements Serializable {
       return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Boolean.valueOf(restrictToNonNegative).hashCode() ^

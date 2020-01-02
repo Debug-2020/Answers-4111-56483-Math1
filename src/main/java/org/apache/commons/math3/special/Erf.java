@@ -22,7 +22,6 @@ import org.apache.commons.math3.util.FastMath;
  * This is a utility class that provides computation methods related to the
  * error functions.
  *
- * @version $Id$
  */
 public class Erf {
 
@@ -150,7 +149,7 @@ public class Erf {
         double p;
 
         if (w < 6.25) {
-            w = w - 3.125;
+            w -= 3.125;
             p =  -3.6444120640178196996e-21;
             p =   -1.685059138182016589e-19 + p * w;
             p =   1.2858480715256400167e-18 + p * w;

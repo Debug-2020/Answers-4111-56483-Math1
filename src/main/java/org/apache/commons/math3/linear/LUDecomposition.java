@@ -43,7 +43,6 @@ import org.apache.commons.math3.util.FastMath;
  *
  * @see <a href="http://mathworld.wolfram.com/LUDecomposition.html">MathWorld</a>
  * @see <a href="http://en.wikipedia.org/wiki/LU_decomposition">Wikipedia</a>
- * @version $Id$
  * @since 2.0 (changed to concrete class in 3.0)
  */
 public class LUDecomposition {
@@ -378,7 +377,12 @@ public class LUDecomposition {
             return new Array2DRowRealMatrix(bp, false);
         }
 
-        /** {@inheritDoc} */
+        /**
+         * Get the inverse of the decomposed matrix.
+         *
+         * @return the inverse matrix.
+         * @throws SingularMatrixException if the decomposed matrix is singular.
+         */
         public RealMatrix getInverse() {
             return solve(MatrixUtils.createRealIdentityMatrix(pivot.length));
         }

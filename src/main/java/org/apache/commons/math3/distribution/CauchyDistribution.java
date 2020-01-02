@@ -19,9 +19,9 @@ package org.apache.commons.math3.distribution;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Implementation of the Cauchy distribution.
@@ -29,7 +29,6 @@ import org.apache.commons.math3.random.Well19937c;
  * @see <a href="http://en.wikipedia.org/wiki/Cauchy_distribution">Cauchy distribution (Wikipedia)</a>
  * @see <a href="http://mathworld.wolfram.com/CauchyDistribution.html">Cauchy Distribution (MathWorld)</a>
  * @since 1.1 (changed to concrete class in 3.0)
- * @version $Id$
  */
 public class CauchyDistribution extends AbstractRealDistribution {
     /**
@@ -56,6 +55,13 @@ public class CauchyDistribution extends AbstractRealDistribution {
 
     /**
      * Creates a Cauchy distribution using the given median and scale.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param median Median for this distribution.
      * @param scale Scale parameter for this distribution.
@@ -66,6 +72,13 @@ public class CauchyDistribution extends AbstractRealDistribution {
 
     /**
      * Creates a Cauchy distribution using the given median and scale.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param median Median for this distribution.
      * @param scale Scale parameter for this distribution.
@@ -78,6 +91,19 @@ public class CauchyDistribution extends AbstractRealDistribution {
     public CauchyDistribution(double median, double scale,
                               double inverseCumAccuracy) {
         this(new Well19937c(), median, scale, inverseCumAccuracy);
+    }
+
+    /**
+     * Creates a Cauchy distribution.
+     *
+     * @param rng Random number generator.
+     * @param median Median for this distribution.
+     * @param scale Scale parameter for this distribution.
+     * @throws NotStrictlyPositiveException if {@code scale <= 0}.
+     * @since 3.3
+     */
+    public CauchyDistribution(RandomGenerator rng, double median, double scale) {
+        this(rng, median, scale, DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
     }
 
     /**

@@ -18,9 +18,11 @@ package org.apache.commons.math3.geometry.euclidean.twod;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
+import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.euclidean.oned.IntervalsSet;
 import org.apache.commons.math3.geometry.partitioning.Region;
 import org.apache.commons.math3.geometry.partitioning.RegionFactory;
@@ -41,7 +43,6 @@ import org.apache.commons.math3.geometry.partitioning.SubHyperplane;
  * internal loops is computed as the reverse of the orientation of
  * their immediate surrounding loop.</p>
 
- * @version $Id$
  * @since 3.0
  */
 class NestedLoops {
@@ -50,7 +51,7 @@ class NestedLoops {
     private Vector2D[] loop;
 
     /** Surrounded loops. */
-    private ArrayList<NestedLoops> surrounded;
+    private List<NestedLoops> surrounded;
 
     /** Polygon enclosing a finite region. */
     private Region<Euclidean2D> polygon;
@@ -58,29 +59,39 @@ class NestedLoops {
     /** Indicator for original loop orientation. */
     private boolean originalIsClockwise;
 
+    /** Tolerance below which points are considered identical. */
+    private final double tolerance;
+
     /** Simple Constructor.
      * <p>Build an empty tree of nested loops. This instance will become
      * the root node of a complete tree, it is not associated with any
      * loop by itself, the outermost loops are in the root tree child
      * nodes.</p>
+     * @param tolerance tolerance below which points are considered identical
+     * @since 3.3
      */
-    public NestedLoops() {
-        surrounded = new ArrayList<NestedLoops>();
+    NestedLoops(final double tolerance) {
+        this.surrounded = new ArrayList<NestedLoops>();
+        this.tolerance  = tolerance;
     }
 
     /** Constructor.
      * <p>Build a tree node with neither parent nor children</p>
      * @param loop boundary loop (will be reversed in place if needed)
+     * @param tolerance tolerance below which points are considered identical
      * @exception MathIllegalArgumentException if an outline has an open boundary loop
+     * @since 3.3
      */
-    private NestedLoops(final Vector2D[] loop) throws MathIllegalArgumentException {
+    private NestedLoops(final Vector2D[] loop, final double tolerance)
+        throws MathIllegalArgumentException {
 
         if (loop[0] == null) {
             throw new MathIllegalArgumentException(LocalizedFormats.OUTLINE_BOUNDARY_LOOP_OPEN);
         }
 
-        this.loop = loop;
-        surrounded = new ArrayList<NestedLoops>();
+        this.loop       = loop;
+        this.surrounded = new ArrayList<NestedLoops>();
+        this.tolerance  = tolerance;
 
         // build the polygon defined by the loop
         final ArrayList<SubHyperplane<Euclidean2D>> edges = new ArrayList<SubHyperplane<Euclidean2D>>();
@@ -88,12 +99,14 @@ class NestedLoops {
         for (int i = 0; i < loop.length; ++i) {
             final Vector2D previous = current;
             current = loop[i];
-            final Line   line   = new Line(previous, current);
+            final Line   line   = new Line(previous, current, tolerance);
             final IntervalsSet region =
-                new IntervalsSet(line.toSubSpace(previous).getX(), line.toSubSpace(current).getX());
+                new IntervalsSet(line.toSubSpace((Point<Euclidean2D>) previous).getX(),
+                                 line.toSubSpace((Point<Euclidean2D>) current).getX(),
+                                 tolerance);
             edges.add(new SubLine(line, region));
         }
-        polygon = new PolygonsSet(edges);
+        polygon = new PolygonsSet(edges, tolerance);
 
         // ensure the polygon encloses a finite region of the plane
         if (Double.isInfinite(polygon.getSize())) {
@@ -111,7 +124,7 @@ class NestedLoops {
      * boundary loops or open boundary loops
      */
     public void add(final Vector2D[] bLoop) throws MathIllegalArgumentException {
-        add(new NestedLoops(bLoop));
+        add(new NestedLoops(bLoop, tolerance));
     }
 
     /** Add a loop in a tree.

@@ -31,7 +31,6 @@ import org.apache.commons.math3.util.FastMath;
  * supplies them.</p>
  *
  * @since 1.1
- * @version $Id$
  */
 public abstract class AbstractRandomGenerator implements RandomGenerator {
 
@@ -109,7 +108,7 @@ public abstract class AbstractRandomGenerator implements RandomGenerator {
           int randInt = nextInt();
           for (int i = 0; i < 3; i++) {
               if ( i > 0) {
-                  randInt = randInt >> 8;
+                  randInt >>= 8;
               }
               bytes[bytesOut++] = (byte) randInt;
               if (bytesOut == bytes.length) {

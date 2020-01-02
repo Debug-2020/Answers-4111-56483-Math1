@@ -25,9 +25,13 @@ import org.apache.commons.math3.optim.OptimizationData;
  * <br/>
  * Immutable class.
  *
- * @version $Id$
  * @since 3.1
+ * @deprecated All classes and interfaces in this package are deprecated.
+ * The optimizers that were provided here were moved to the
+ * {@link org.apache.commons.math3.fitting.leastsquares} package
+ * (cf. MATH-1008).
  */
+@Deprecated
 public class Target implements OptimizationData {
     /** Target values (of the objective vector function). */
     private final double[] target;

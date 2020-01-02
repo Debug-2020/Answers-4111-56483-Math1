@@ -34,7 +34,6 @@ import java.util.ResourceBundle;
  * translation is missing.
  * </p>
  * @since 2.2
- * @version $Id$
  */
 public enum LocalizedFormats implements Localizable {
 
@@ -49,6 +48,8 @@ public enum LocalizedFormats implements Localizable {
     AT_LEAST_ONE_COLUMN("matrix must have at least one column"),
     AT_LEAST_ONE_ROW("matrix must have at least one row"),
     BANDWIDTH("bandwidth ({0})"),
+    BESSEL_FUNCTION_BAD_ARGUMENT("Bessel function of order {0} cannot be computed for x = {1}"),
+    BESSEL_FUNCTION_FAILED_CONVERGENCE("Bessel function of order {0} failed to converge for x = {1}"),
     BINOMIAL_INVALID_PARAMETERS_ORDER("must have n >= k for binomial coefficient (n, k), got k = {0}, n = {1}"),
     BINOMIAL_NEGATIVE_PARAMETER("must have n >= 0 for binomial coefficient (n, k), got n = {0}"),
     CANNOT_CLEAR_STATISTIC_CONSTRUCTED_FROM_EXTERNAL_MOMENTS("statistics constructed from external moments cannot be cleared"),
@@ -69,6 +70,7 @@ public enum LocalizedFormats implements Localizable {
     CANNOT_TRANSFORM_TO_DOUBLE("Conversion Exception in Transformation: {0}"),
     CARDAN_ANGLES_SINGULARITY("Cardan angles singularity"),
     CLASS_DOESNT_IMPLEMENT_COMPARABLE("class ({0}) does not implement Comparable"),
+    CLOSE_VERTICES("too close vertices near point ({0}, {1}, {2})"),
     CLOSEST_ORTHOGONAL_MATRIX_HAS_NEGATIVE_DETERMINANT("the closest orthogonal matrix has a negative determinant {0}"),
     COLUMN_INDEX_OUT_OF_RANGE("column index {0} out of allowed range [{1}, {2}]"),
     COLUMN_INDEX("column index ({0})"), /* keep */
@@ -90,6 +92,7 @@ public enum LocalizedFormats implements Localizable {
     DISCRETE_CUMULATIVE_PROBABILITY_RETURNED_NAN("Discrete cumulative probability function returned NaN for argument {0}"),
     DISTRIBUTION_NOT_LOADED("distribution not loaded"),
     DUPLICATED_ABSCISSA_DIVISION_BY_ZERO("duplicated abscissa {0} causes division by zero"),
+    EDGE_CONNECTED_TO_ONE_FACET("edge joining points ({0}, {1}, {2}) and ({3}, {4}, {5}) is connected to one facet only"),
     ELITISM_RATE("elitism rate ({0})"),
     EMPTY_CLUSTER_IN_K_MEANS("empty cluster in k-means"),
     EMPTY_INTERPOLATION_SAMPLE("sample for interpolation is empty"),
@@ -102,6 +105,7 @@ public enum LocalizedFormats implements Localizable {
     EULER_ANGLES_SINGULARITY("Euler angles singularity"),
     EVALUATION("evaluation"), /* keep */
     EXPANSION_FACTOR_SMALLER_THAN_ONE("expansion factor smaller than one ({0})"),
+    FACET_ORIENTATION_MISMATCH("facets orientation mismatch around edge joining points ({0}, {1}, {2}) and ({3}, {4}, {5})"),
     FACTORIAL_NEGATIVE_PARAMETER("must have n >= 0 for n!, got n = {0}"),
     FAILED_BRACKETING("number of iterations={4}, maximum iterations={5}, initial={6}, lower bound={7}, upper bound={8}, final a value={0}, final b value={1}, f(a)={2}, f(b)={3}"),
     FAILED_FRACTION_CONVERSION("Unable to convert {0} to fraction after {1} iterations"),
@@ -115,6 +119,7 @@ public enum LocalizedFormats implements Localizable {
     GCD_OVERFLOW_64_BITS("overflow: gcd({0}, {1}) is 2^63"),
     HOLE_BETWEEN_MODELS_TIME_RANGES("{0} wide hole between models time ranges"),
     ILL_CONDITIONED_OPERATOR("condition number {1} is too high "),
+    INCONSISTENT_STATE_AT_2_PI_WRAPPING("inconsistent state at 2\u03c0 wrapping"),
     INDEX_LARGER_THAN_MAX("the index specified: {0} is larger than the current maximal index {1}"),
     INDEX_NOT_POSITIVE("index ({0}) is not positive"),
     INDEX_OUT_OF_RANGE("index {0} out of allowed range [{1}, {2}]"),
@@ -130,6 +135,7 @@ public enum LocalizedFormats implements Localizable {
     @Deprecated
     INPUT_DATA_FROM_UNSUPPORTED_DATASOURCE("input data comes from unsupported datasource: {0}, supported sources: {1}, {2}"),
     INSTANCES_NOT_COMPARABLE_TO_EXISTING_VALUES("instance of class {0} not comparable to existing values"),
+    INSUFFICIENT_DATA("insufficient data"),
     INSUFFICIENT_DATA_FOR_T_STATISTIC("insufficient data for t statistic, needs at least 2, got {0}"),
     INSUFFICIENT_DIMENSION("insufficient dimension {0}, must be at least {1}"),
     DIMENSION("dimension ({0})"), /* keep */
@@ -141,6 +147,7 @@ public enum LocalizedFormats implements Localizable {
     INVALID_BINARY_CHROMOSOME("binary mutation works on BinaryChromosome only"),
     INVALID_BRACKETING_PARAMETERS("invalid bracketing parameters:  lower bound={0},  initial={1}, upper bound={2}"),
     INVALID_FIXED_LENGTH_CHROMOSOME("one-point crossover only works with fixed-length chromosomes"),
+    INVALID_IMPLEMENTATION("required functionality is missing in {0}"),
     INVALID_INTERVAL_INITIAL_VALUE_PARAMETERS("invalid interval, initial value parameters:  lower={0}, initial={1}, upper={2}"),
     INVALID_ITERATIONS_LIMITS("invalid iteration limits: min={0}, max={1}"),
     INVALID_MAX_ITERATIONS("bad value for maximum iterations number: {0}"),
@@ -157,6 +164,7 @@ public enum LocalizedFormats implements Localizable {
     LOWER_BOUND_NOT_BELOW_UPPER_BOUND("lower bound ({0}) must be strictly less than upper bound ({1})"), /* keep */
     LOWER_ENDPOINT_ABOVE_UPPER_ENDPOINT("lower endpoint ({0}) must be less than or equal to upper endpoint ({1})"),
     MAP_MODIFIED_WHILE_ITERATING("map has been modified while iterating"),
+    MULTISTEP_STARTER_STOPPED_EARLY("multistep integrator starter stopped early, maybe too large step size"),
     EVALUATIONS("evaluations"), /* keep */
     MAX_COUNT_EXCEEDED("maximal count ({0}) exceeded"), /* keep */
     MAX_ITERATIONS_EXCEEDED("maximal number of iterations ({0}) exceeded"),
@@ -174,6 +182,8 @@ public enum LocalizedFormats implements Localizable {
     NEGATIVE_NUMBER_OF_TRIALS("number of trials must be non-negative ({0})"),
     NUMBER_OF_INTERPOLATION_POINTS("number of interpolation points ({0})"), /* keep */
     NUMBER_OF_TRIALS("number of trials ({0})"),
+    NOT_CONVEX("vertices do not form a convex hull in CCW winding"),
+    NOT_CONVEX_HYPERPLANES("hyperplanes do not define a convex region"),
     ROBUSTNESS_ITERATIONS("number of robustness iterations ({0})"),
     START_POSITION("start position ({0})"), /* keep */
     NON_CONVERGENT_CONTINUED_FRACTION("Continued fraction convergents failed to converge (in less than {0} iterations) for value {1}"),
@@ -205,6 +215,7 @@ public enum LocalizedFormats implements Localizable {
     NOT_POSITIVE_ELEMENT_AT_INDEX("element {0} is not positive: {1}"),
     NOT_POSITIVE_EXPONENT("invalid exponent {0} (must be positive)"),
     NUMBER_OF_ELEMENTS_SHOULD_BE_POSITIVE("number of elements should be positive ({0})"),
+    BASE("base ({0})"), /* keep */
     EXPONENT("exponent ({0})"), /* keep */
     NOT_POSITIVE_LENGTH("length must be positive ({0})"),
     LENGTH("length ({0})"), /* keep */
@@ -275,9 +286,11 @@ public enum LocalizedFormats implements Localizable {
     OBSERVED_COUNTS_BOTTH_ZERO_FOR_ENTRY("observed counts are both zero for entry {0}"),
     BOBYQA_BOUND_DIFFERENCE_CONDITION("the difference between the upper and lower bound must be larger than twice the initial trust region radius ({0})"),
     OUT_OF_BOUNDS_QUANTILE_VALUE("out of bounds quantile value: {0}, must be in (0, 100]"),
+    OUT_OF_BOUNDS_CONFIDENCE_LEVEL("out of bounds confidence level {0}, must be between {1} and {2}"),
     OUT_OF_BOUND_SIGNIFICANCE_LEVEL("out of bounds significance level {0}, must be between {1} and {2}"),
     SIGNIFICANCE_LEVEL("significance level ({0})"), /* keep */
     OUT_OF_ORDER_ABSCISSA_ARRAY("the abscissae array must be sorted in a strictly increasing order, but the {0}-th element is {1} whereas {2}-th is {3}"),
+    OUT_OF_PLANE("point ({0}, {1}, {2}) is out of plane"),
     OUT_OF_RANGE_ROOT_OF_UNITY_INDEX("out of range root of unity index {0} (must be in [{1};{2}])"),
     OUT_OF_RANGE("out of range"), /* keep */
     OUT_OF_RANGE_SIMPLE("{0} out of [{1}, {2}] range"), /* keep */
@@ -288,6 +301,7 @@ public enum LocalizedFormats implements Localizable {
     OVERFLOW_IN_FRACTION("overflow in fraction {0}/{1}, cannot negate"),
     OVERFLOW_IN_ADDITION("overflow in addition: {0} + {1}"),
     OVERFLOW_IN_SUBTRACTION("overflow in subtraction: {0} - {1}"),
+    OVERFLOW_IN_MULTIPLICATION("overflow in multiplication: {0} * {1}"),
     PERCENTILE_IMPLEMENTATION_CANNOT_ACCESS_METHOD("cannot access {0} method in percentile implementation {1}"),
     PERCENTILE_IMPLEMENTATION_UNSUPPORTED_METHOD("percentile implementation {0} does not support {1}"),
     PERMUTATION_EXCEEDS_N("permutation size ({0}) exceeds permuation domain ({1})"), /* keep */
@@ -367,7 +381,7 @@ public enum LocalizedFormats implements Localizable {
      * @param sourceFormat source English format to use when no
      * localized version is available
      */
-    private LocalizedFormats(final String sourceFormat) {
+    LocalizedFormats(final String sourceFormat) {
         this.sourceFormat = sourceFormat;
     }
 

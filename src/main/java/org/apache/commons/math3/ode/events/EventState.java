@@ -40,7 +40,6 @@ import org.apache.commons.math3.util.FastMath;
  * decide if the handler should trigger an event or not during the
  * proposed step.</p>
  *
- * @version $Id$
  * @since 1.2
  */
 public class EventState {
@@ -237,6 +236,7 @@ public class EventState {
             final double h = dt / n;
 
             final UnivariateFunction f = new UnivariateFunction() {
+                /** {@inheritDoc} */
                 public double value(final double t) throws LocalMaxCountExceededException {
                     try {
                         interpolator.setInterpolatedTime(t);
@@ -252,7 +252,7 @@ public class EventState {
             for (int i = 0; i < n; ++i) {
 
                 // evaluate handler value at the end of the substep
-                final double tb = t0 + (i + 1) * h;
+                final double tb = (i == n - 1) ? t1 : t0 + (i + 1) * h;
                 interpolator.setInterpolatedTime(tb);
                 final double gb = handler.g(tb, getCompleteState(interpolator));
 
@@ -290,10 +290,25 @@ public class EventState {
                         (FastMath.abs(root - ta) <= convergence) &&
                         (FastMath.abs(root - previousEventTime) <= convergence)) {
                         // we have either found nothing or found (again ?) a past event,
-                        // retry the substep excluding this value
-                        ta = forward ? ta + convergence : ta - convergence;
-                        ga = f.value(ta);
-                        --i;
+                        // retry the substep excluding this value, and taking care to have the
+                        // required sign in case the g function is noisy around its zero and
+                        // crosses the axis several times
+                        do {
+                            ta = forward ? ta + convergence : ta - convergence;
+                            ga = f.value(ta);
+                        } while ((g0Positive ^ (ga >= 0)) && (forward ^ (ta >= tb)));
+
+                        if (forward ^ (ta >= tb)) {
+                            // we were able to skip this spurious root
+                            --i;
+                        } else {
+                            // we can't avoid this root before the end of the step,
+                            // we have to handle it despite it is close to the former one
+                            // maybe we have two very close roots
+                            pendingEventTime = root;
+                            pendingEvent = true;
+                            return true;
+                        }
                     } else if (Double.isNaN(previousEventTime) ||
                                (FastMath.abs(previousEventTime - root) > convergence)) {
                         pendingEventTime = root;
@@ -400,7 +415,7 @@ public class EventState {
         /** Simple constructor.
          * @param exception exception to wrap
          */
-        public LocalMaxCountExceededException(final MaxCountExceededException exception) {
+        LocalMaxCountExceededException(final MaxCountExceededException exception) {
             wrapped = exception;
         }
 

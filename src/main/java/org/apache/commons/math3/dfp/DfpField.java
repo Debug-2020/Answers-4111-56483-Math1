@@ -21,7 +21,6 @@ import org.apache.commons.math3.Field;
 import org.apache.commons.math3.FieldElement;
 
 /** Field for Decimal floating point instances.
- * @version $Id$
  * @since 2.2
  */
 public class DfpField implements Field<Dfp> {
@@ -742,7 +741,7 @@ public class DfpField implements Field<Dfp> {
         for (int i = 0; i < 10000; i++) {
             num = num.multiply(x);
             num = num.multiply(x);
-            den = den + 2;
+            den += 2;
             Dfp t = num.divide(den);
             y = y.add(t);
             if (y.equals(py)) {

@@ -16,6 +16,7 @@
  */
 package org.apache.commons.math3.optimization.univariate;
 
+import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.Incrementor;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
@@ -28,7 +29,6 @@ import org.apache.commons.math3.optimization.GoalType;
  * This code is based on a Python implementation (from <em>SciPy</em>,
  * module {@code optimize.py} v0.5).
  *
- * @version $Id$
  * @deprecated As of 3.1 (to be removed in 4.0).
  * @since 2.2
  */
@@ -138,7 +138,7 @@ public class BracketFinder {
             double tmp2 = (xB - xC) * (fB - fA);
 
             double val = tmp2 - tmp1;
-            double denom = Math.abs(val) < EPS_MIN ? 2 * EPS_MIN : 2 * val;
+            double denom = FastMath.abs(val) < EPS_MIN ? 2 * EPS_MIN : 2 * val;
 
             double w = xB - ((xB - xC) * tmp2 - (xB - xA) * tmp1) / denom;
             double wLim = xB + growLimit * (xC - xB);

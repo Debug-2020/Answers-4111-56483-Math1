@@ -34,7 +34,6 @@ import org.apache.commons.math3.util.FastMath;
  * searched by a least square estimator initialized with a rough guess
  * based on integrals.
  *
- * @version $Id$
  * @deprecated As of 3.1 (to be removed in 4.0).
  * @since 2.0
  */
@@ -260,7 +259,7 @@ public class HarmonicFitter extends CurveFitter<HarmonicOscillator.Parametric> {
 
         /**
          * Estimate a first guess of the amplitude and angular frequency.
-         * This method assumes that the {@link #sortObservations()} method
+         * This method assumes that the {@link #sortObservations(WeightedObservedPoint[])} method
          * has been called previously.
          *
          * @param observations Observations, sorted w.r.t. abscissa.

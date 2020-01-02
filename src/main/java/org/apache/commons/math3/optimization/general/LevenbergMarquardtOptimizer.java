@@ -101,7 +101,6 @@ import org.apache.commons.math3.util.FastMath;
  *     POSSIBILITY OF SUCH LOSS OR DAMAGES.</strong></li>
  * <ol></td></tr>
  * </table>
- * @version $Id$
  * @deprecated As of 3.1 (to be removed in 4.0).
  * @since 2.0
  *
@@ -446,7 +445,7 @@ public class LevenbergMarquardtOptimizer extends AbstractLeastSquaresOptimizer {
                     coeff1 += work1[j] * work1[j];
                 }
                 double pc2 = previousCost * previousCost;
-                coeff1 = coeff1 / pc2;
+                coeff1 /= pc2;
                 double coeff2 = lmPar * lmNorm * lmNorm / pc2;
                 double preRed = coeff1 + 2 * coeff2;
                 double dirDer = -(coeff1 + coeff2);

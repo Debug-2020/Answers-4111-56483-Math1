@@ -31,7 +31,6 @@ import org.apache.commons.math3.ode.sampling.AbstractStepInterpolator;
  * @see RungeKuttaIntegrator
  * @see EmbeddedRungeKuttaIntegrator
  *
- * @version $Id$
  * @since 1.2
  */
 
@@ -80,7 +79,7 @@ abstract class RungeKuttaStepInterpolator
   * @param interpolator interpolator to copy from.
 
   */
-  public RungeKuttaStepInterpolator(final RungeKuttaStepInterpolator interpolator) {
+  RungeKuttaStepInterpolator(final RungeKuttaStepInterpolator interpolator) {
 
     super(interpolator);
 

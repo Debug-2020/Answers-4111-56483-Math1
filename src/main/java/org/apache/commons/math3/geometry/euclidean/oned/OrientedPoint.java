@@ -16,6 +16,7 @@
  */
 package org.apache.commons.math3.geometry.euclidean.oned;
 
+import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.Vector;
 import org.apache.commons.math3.geometry.partitioning.Hyperplane;
 
@@ -23,10 +24,12 @@ import org.apache.commons.math3.geometry.partitioning.Hyperplane;
  * <p>An hyperplane in 1D is a simple point, its orientation being a
  * boolean.</p>
  * <p>Instances of this class are guaranteed to be immutable.</p>
- * @version $Id$
  * @since 3.0
  */
 public class OrientedPoint implements Hyperplane<Euclidean1D> {
+
+    /** Default value for tolerance. */
+    private static final double DEFAULT_TOLERANCE = 1.0e-10;
 
     /** Vector location. */
     private Vector1D location;
@@ -34,14 +37,31 @@ public class OrientedPoint implements Hyperplane<Euclidean1D> {
     /** Orientation. */
     private boolean direct;
 
+    /** Tolerance below which points are considered to belong to the hyperplane. */
+    private final double tolerance;
+
     /** Simple constructor.
      * @param location location of the hyperplane
      * @param direct if true, the plus side of the hyperplane is towards
      * abscissas greater than {@code location}
+     * @param tolerance tolerance below which points are considered to belong to the hyperplane
+     * @since 3.3
      */
+    public OrientedPoint(final Vector1D location, final boolean direct, final double tolerance) {
+        this.location  = location;
+        this.direct    = direct;
+        this.tolerance = tolerance;
+    }
+
+    /** Simple constructor.
+     * @param location location of the hyperplane
+     * @param direct if true, the plus side of the hyperplane is towards
+     * abscissas greater than {@code location}
+     * @deprecated as of 3.3, replaced with {@link #OrientedPoint(Vector1D, boolean, double)}
+     */
+    @Deprecated
     public OrientedPoint(final Vector1D location, final boolean direct) {
-        this.location = location;
-        this.direct   = direct;
+        this(location, direct, DEFAULT_TOLERANCE);
     }
 
     /** Copy the instance.
@@ -53,8 +73,16 @@ public class OrientedPoint implements Hyperplane<Euclidean1D> {
         return this;
     }
 
+    /** Get the offset (oriented distance) of a vector.
+     * @param vector vector to check
+     * @return offset of the vector
+     */
+    public double getOffset(Vector<Euclidean1D> vector) {
+        return getOffset((Point<Euclidean1D>) vector);
+    }
+
     /** {@inheritDoc} */
-    public double getOffset(final Vector<Euclidean1D> point) {
+    public double getOffset(final Point<Euclidean1D> point) {
         final double delta = ((Vector1D) point).getX() - location.getX();
         return direct ? delta : -delta;
     }
@@ -79,12 +107,26 @@ public class OrientedPoint implements Hyperplane<Euclidean1D> {
      * IntervalsSet IntervalsSet} instance)
      */
     public IntervalsSet wholeSpace() {
-        return new IntervalsSet();
+        return new IntervalsSet(tolerance);
     }
 
     /** {@inheritDoc} */
     public boolean sameOrientationAs(final Hyperplane<Euclidean1D> other) {
         return !(direct ^ ((OrientedPoint) other).direct);
+    }
+
+    /** {@inheritDoc}
+     * @since 3.3
+     */
+    public Point<Euclidean1D> project(Point<Euclidean1D> point) {
+        return location;
+    }
+
+    /** {@inheritDoc}
+     * @since 3.3
+     */
+    public double getTolerance() {
+        return tolerance;
     }
 
     /** Get the hyperplane location on the real line.

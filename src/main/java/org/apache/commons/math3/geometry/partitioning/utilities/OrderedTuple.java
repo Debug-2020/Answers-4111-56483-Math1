@@ -88,9 +88,11 @@ import org.apache.commons.math3.util.FastMath;
  * components</li>
  * </ul>
  *
- * @version $Id$
  * @since 3.0
+ * @deprecated as of 3.4, this class is not used anymore and considered
+ * to be out of scope of Apache Commons Math
  */
+@Deprecated
 public class OrderedTuple implements Comparable<OrderedTuple> {
 
     /** Sign bit mask. */
@@ -369,10 +371,10 @@ public class OrderedTuple implements Comparable<OrderedTuple> {
         while (scale != 0) {
             if ((ll & mask) != ll) {
                 msb |= scale;
-                ll = ll >> scale;
+                ll >>= scale;
             }
-            scale = scale >> 1;
-            mask  = mask >> scale;
+            scale >>= 1;
+            mask >>= scale;
         }
 
         return msb;
@@ -395,10 +397,10 @@ public class OrderedTuple implements Comparable<OrderedTuple> {
         while (scale != 0) {
             if ((ll & mask) == ll) {
                 lsb |= scale;
-                ll = ll >> scale;
+                ll >>= scale;
             }
-            scale = scale >> 1;
-            mask  = mask >> scale;
+            scale >>= 1;
+            mask >>= scale;
         }
 
         return lsb;

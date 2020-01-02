@@ -40,7 +40,7 @@ import org.apache.commons.math3.util.FastMath;
  * @see ClassicalRungeKuttaIntegrator
  * @see MidpointIntegrator
  * @see ThreeEighthesIntegrator
- * @version $Id$
+ * @see LutherIntegrator
  * @since 1.2
  */
 

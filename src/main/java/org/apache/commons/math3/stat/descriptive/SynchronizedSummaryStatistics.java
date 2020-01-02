@@ -31,7 +31,6 @@ import org.apache.commons.math3.util.MathUtils;
  * the instance nor compute another statistic.
  *
  * @since 1.2
- * @version $Id$
  */
 public class SynchronizedSummaryStatistics extends SummaryStatistics {
 
@@ -110,6 +109,14 @@ public class SynchronizedSummaryStatistics extends SummaryStatistics {
     @Override
     public synchronized double getStandardDeviation() {
         return super.getStandardDeviation();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized double getQuadraticMean() {
+        return super.getQuadraticMean();
     }
 
     /**

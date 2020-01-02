@@ -71,7 +71,6 @@ import org.apache.commons.math3.util.FastMath;
  * </p>
  * @see <a href="http://mathworld.wolfram.com/EigenDecomposition.html">MathWorld</a>
  * @see <a href="http://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix">Wikipedia</a>
- * @version $Id$
  * @since 2.0 (changed to concrete class in 3.0)
  */
 public class EigenDecomposition {
@@ -513,13 +512,34 @@ public class EigenDecomposition {
          * @return true if the decomposed matrix is non-singular.
          */
         public boolean isNonSingular() {
+            double largestEigenvalueNorm = 0.0;
+            // Looping over all values (in case they are not sorted in decreasing
+            // order of their norm).
             for (int i = 0; i < realEigenvalues.length; ++i) {
-                if (realEigenvalues[i] == 0 &&
-                    imagEigenvalues[i] == 0) {
+                largestEigenvalueNorm = FastMath.max(largestEigenvalueNorm, eigenvalueNorm(i));
+            }
+            // Corner case: zero matrix, all exactly 0 eigenvalues
+            if (largestEigenvalueNorm == 0.0) {
+                return false;
+            }
+            for (int i = 0; i < realEigenvalues.length; ++i) {
+                // Looking for eigenvalues that are 0, where we consider anything much much smaller
+                // than the largest eigenvalue to be effectively 0.
+                if (Precision.equals(eigenvalueNorm(i) / largestEigenvalueNorm, 0, EPSILON)) {
                     return false;
                 }
             }
             return true;
+        }
+
+        /**
+         * @param i which eigenvalue to find the norm of
+         * @return the norm of ith (complex) eigenvalue.
+         */
+        private double eigenvalueNorm(int i) {
+            final double re = realEigenvalues[i];
+            final double im = imagEigenvalues[i];
+            return FastMath.sqrt(re * re + im * im);
         }
 
         /**
@@ -640,13 +660,13 @@ public class EigenDecomposition {
                             t = FastMath.sqrt(c * c + 1.0);
                             e[i + 1] = p * t;
                             s = 1.0 / t;
-                            c = c * s;
+                            c *= s;
                         } else {
                             s = p / q;
                             t = FastMath.sqrt(s * s + 1.0);
                             e[i + 1] = q * t;
                             c = 1.0 / t;
-                            s = s * c;
+                            s *= c;
                         }
                         if (e[i + 1] == 0.0) {
                             realEigenvalues[i + 1] -= u;
@@ -782,7 +802,7 @@ public class EigenDecomposition {
         double norm = 0.0;
         for (int i = 0; i < n; i++) {
            for (int j = FastMath.max(i - 1, 0); j < n; j++) {
-              norm = norm + FastMath.abs(matrixT[i][j]);
+               norm += FastMath.abs(matrixT[i][j]);
            }
         }
 
@@ -809,9 +829,9 @@ public class EigenDecomposition {
                     double w = matrixT[i][i] - p;
                     r = 0.0;
                     for (int j = l; j <= idx; j++) {
-                        r = r + matrixT[i][j] * matrixT[j][idx];
+                        r += matrixT[i][j] * matrixT[j][idx];
                     }
-                    if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) < 0.0) {
+                    if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) < 0) {
                         z = w;
                         s = r;
                     } else {
@@ -841,7 +861,7 @@ public class EigenDecomposition {
                         double t = FastMath.abs(matrixT[i][idx]);
                         if ((Precision.EPSILON * t) * t > 1) {
                             for (int j = i; j <= idx; j++) {
-                                matrixT[j][idx] = matrixT[j][idx] / t;
+                                matrixT[j][idx] /= t;
                             }
                         }
                     }
@@ -868,12 +888,12 @@ public class EigenDecomposition {
                     double ra = 0.0;
                     double sa = 0.0;
                     for (int j = l; j <= idx; j++) {
-                        ra = ra + matrixT[i][j] * matrixT[j][idx - 1];
-                        sa = sa + matrixT[i][j] * matrixT[j][idx];
+                        ra += matrixT[i][j] * matrixT[j][idx - 1];
+                        sa += matrixT[i][j] * matrixT[j][idx];
                     }
                     double w = matrixT[i][i] - p;
 
-                    if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) < 0.0) {
+                    if (Precision.compareTo(imagEigenvalues[i], 0.0, EPSILON) < 0) {
                         z = w;
                         r = ra;
                         s = sa;
@@ -918,20 +938,11 @@ public class EigenDecomposition {
                                                 FastMath.abs(matrixT[i][idx]));
                         if ((Precision.EPSILON * t) * t > 1) {
                             for (int j = i; j <= idx; j++) {
-                                matrixT[j][idx - 1] = matrixT[j][idx - 1] / t;
-                                matrixT[j][idx]     = matrixT[j][idx] / t;
+                                matrixT[j][idx - 1] /= t;
+                                matrixT[j][idx] /= t;
                             }
                         }
                     }
-                }
-            }
-        }
-
-        // Vectors of isolated roots
-        for (int i = 0; i < n; i++) {
-            if (i < 0 | i > n - 1) {
-                for (int j = i; j < n; j++) {
-                    matrixP[i][j] = matrixT[i][j];
                 }
             }
         }
@@ -941,7 +952,7 @@ public class EigenDecomposition {
             for (int i = 0; i <= n - 1; i++) {
                 z = 0.0;
                 for (int k = 0; k <= FastMath.min(j, n - 1); k++) {
-                    z = z + matrixP[i][k] * matrixT[k][j];
+                    z += matrixP[i][k] * matrixT[k][j];
                 }
                 matrixP[i][j] = z;
             }

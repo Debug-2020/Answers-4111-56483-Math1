@@ -37,7 +37,6 @@ import org.apache.commons.math3.util.FastMath;
  * by the {@link Logistic} class.
  *
  * @since 3.0
- * @version $Id$
  */
 public class Sigmoid implements UnivariateDifferentiableFunction, DifferentiableUnivariateFunction {
     /** Lower asymptote. */
@@ -80,7 +79,8 @@ public class Sigmoid implements UnivariateDifferentiableFunction, Differentiable
 
     /**
      * Parametric function where the input array contains the parameters of
-     * the logit function, ordered as follows:
+     * the {@link Sigmoid#Sigmoid(double,double) sigmoid function}, ordered
+     * as follows:
      * <ul>
      *  <li>Lower asymptote</li>
      *  <li>Higher asymptote</li>

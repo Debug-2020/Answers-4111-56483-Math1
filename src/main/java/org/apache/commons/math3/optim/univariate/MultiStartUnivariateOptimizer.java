@@ -35,7 +35,6 @@ import org.apache.commons.math3.optim.OptimizationData;
  * turn with different starting points (trying to avoid being trapped
  * in a local extremum when looking for a global one).
  *
- * @version $Id$
  * @since 3.0
  */
 public class MultiStartUnivariateOptimizer
@@ -211,6 +210,7 @@ public class MultiStartUnivariateOptimizer
      */
     private void sortPairs(final GoalType goal) {
         Arrays.sort(optima, new Comparator<UnivariatePointValuePair>() {
+                /** {@inheritDoc} */
                 public int compare(final UnivariatePointValuePair o1,
                                    final UnivariatePointValuePair o2) {
                     if (o1 == null) {

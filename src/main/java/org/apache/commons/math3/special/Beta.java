@@ -49,7 +49,6 @@ import org.apache.commons.math3.util.FastMath;
  * </p>
  *
  *
- * @version $Id$
  */
 public class Beta {
     /** Maximum allowed numerical error. */
@@ -189,14 +188,16 @@ public class Beta {
             Double.isNaN(b) ||
             x < 0 ||
             x > 1 ||
-            a <= 0.0 ||
-            b <= 0.0) {
+            a <= 0 ||
+            b <= 0) {
             ret = Double.NaN;
-        } else if (x > (a + 1.0) / (a + b + 2.0)) {
-            ret = 1.0 - regularizedBeta(1.0 - x, b, a, epsilon, maxIterations);
+        } else if (x > (a + 1) / (2 + b + a) &&
+                   1 - x <= (b + 1) / (2 + b + a)) {
+            ret = 1 - regularizedBeta(1 - x, b, a, epsilon, maxIterations);
         } else {
             ContinuedFraction fraction = new ContinuedFraction() {
 
+                /** {@inheritDoc} */
                 @Override
                 protected double getB(int n, double x) {
                     double ret;
@@ -213,12 +214,13 @@ public class Beta {
                     return ret;
                 }
 
+                /** {@inheritDoc} */
                 @Override
                 protected double getA(int n, double x) {
                     return 1.0;
                 }
             };
-            ret = FastMath.exp((a * FastMath.log(x)) + (b * FastMath.log(1.0 - x)) -
+            ret = FastMath.exp((a * FastMath.log(x)) + (b * FastMath.log1p(-x)) -
                 FastMath.log(a) - logBeta(a, b)) *
                 1.0 / fraction.evaluate(x, epsilon, maxIterations);
         }
@@ -257,7 +259,7 @@ public class Beta {
     /**
      * Returns the value of log Γ(a + b) for 1 ≤ a, b ≤ 2. Based on the
      * <em>NSWC Library of Mathematics Subroutines</em> double precision
-     * implementation, {@code DGSMLN}. In {@link BetaTest#testLogGammaSum()},
+     * implementation, {@code DGSMLN}. In {@code BetaTest.testLogGammaSum()},
      * this private method is accessed through reflection.
      *
      * @param a First argument.
@@ -290,7 +292,7 @@ public class Beta {
      * Returns the value of log[Γ(b) / Γ(a + b)] for a ≥ 0 and b ≥ 10. Based on
      * the <em>NSWC Library of Mathematics Subroutines</em> double precision
      * implementation, {@code DLGDIV}. In
-     * {@link BetaTest#testLogGammaMinusLogGammaSum()}, this private method is
+     * {@code BetaTest.testLogGammaMinusLogGammaSum()}, this private method is
      * accessed through reflection.
      *
      * @param a First argument.
@@ -377,7 +379,7 @@ public class Beta {
      * Returns the value of Δ(p) + Δ(q) - Δ(p + q), with p, q ≥ 10. Based on
      * the <em>NSWC Library of Mathematics Subroutines</em> double precision
      * implementation, {@code DBCORR}. In
-     * {@link BetaTest#testSumDeltaMinusDeltaSum()}, this private method is
+     * {@code BetaTest.testSumDeltaMinusDeltaSum()}, this private method is
      * accessed through reflection.
      *
      * @param p First argument.

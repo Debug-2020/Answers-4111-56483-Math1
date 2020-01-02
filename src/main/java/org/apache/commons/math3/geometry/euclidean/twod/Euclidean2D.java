@@ -23,8 +23,7 @@ import org.apache.commons.math3.geometry.Space;
 import org.apache.commons.math3.geometry.euclidean.oned.Euclidean1D;
 
 /**
- * This class implements a three-dimensional space.
- * @version $Id$
+ * This class implements a two-dimensional space.
  * @since 3.0
  */
 public class Euclidean2D implements Serializable, Space {

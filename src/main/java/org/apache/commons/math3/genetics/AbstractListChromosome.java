@@ -25,7 +25,6 @@ import java.util.List;
  * Chromosome represented by an immutable list of a fixed length.
  *
  * @param <T> type of the representation list
- * @version $Id$
  * @since 2.0
  */
 public abstract class AbstractListChromosome<T> extends Chromosome {
@@ -34,22 +33,33 @@ public abstract class AbstractListChromosome<T> extends Chromosome {
     private final List<T> representation;
 
     /**
-     * Constructor.
+     * Constructor, copying the input representation.
      * @param representation inner representation of the chromosome
      * @throws InvalidRepresentationException iff the <code>representation</code> can not represent a valid chromosome
      */
     public AbstractListChromosome(final List<T> representation) throws InvalidRepresentationException {
-        checkValidity(representation);
-        this.representation = Collections.unmodifiableList(new ArrayList<T> (representation));
+        this(representation, true);
     }
 
     /**
-     * Constructor.
+     * Constructor, copying the input representation.
      * @param representation inner representation of the chromosome
      * @throws InvalidRepresentationException iff the <code>representation</code> can not represent a valid chromosome
      */
     public AbstractListChromosome(final T[] representation) throws InvalidRepresentationException {
         this(Arrays.asList(representation));
+    }
+
+    /**
+     * Constructor.
+     * @param representation inner representation of the chromosome
+     * @param copyList if {@code true}, the representation will be copied, otherwise it will be referenced.
+     * @since 3.3
+     */
+    public AbstractListChromosome(final List<T> representation, final boolean copyList) {
+        checkValidity(representation);
+        this.representation =
+                Collections.unmodifiableList(copyList ? new ArrayList<T>(representation) : representation);
     }
 
     /**
@@ -88,6 +98,7 @@ public abstract class AbstractListChromosome<T> extends Chromosome {
      */
     public abstract AbstractListChromosome<T> newFixedLengthChromosome(final List<T> chromosomeRepresentation);
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return String.format("(f=%s %s)", getFitness(), getRepresentation());

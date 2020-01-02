@@ -39,7 +39,6 @@ import org.apache.commons.math3.util.Precision;
  * @see <a href="http://mathworld.wolfram.com/SchurDecomposition.html">Schur Decomposition - MathWorld</a>
  * @see <a href="http://en.wikipedia.org/wiki/Schur_decomposition">Schur Decomposition - Wikipedia</a>
  * @see <a href="http://en.wikipedia.org/wiki/Householder_transformation">Householder Transformations</a>
- * @version $Id$
  * @since 3.1
  */
 class SchurTransformer {
@@ -66,7 +65,7 @@ class SchurTransformer {
      * @param matrix matrix to transform
      * @throws NonSquareMatrixException if the matrix is not square
      */
-    public SchurTransformer(final RealMatrix matrix) {
+    SchurTransformer(final RealMatrix matrix) {
         if (!matrix.isSquare()) {
             throw new NonSquareMatrixException(matrix.getRowDimension(),
                                                matrix.getColumnDimension());
@@ -149,7 +148,7 @@ class SchurTransformer {
             // Check for convergence
             if (il == iu) {
                 // One root found
-                matrixT[iu][iu] = matrixT[iu][iu] + shift.exShift;
+                matrixT[iu][iu] += shift.exShift;
                 iu--;
                 iteration = 0;
             } else if (il == iu - 1) {
@@ -171,8 +170,8 @@ class SchurTransformer {
                     p = x / s;
                     q = z / s;
                     final double r = FastMath.sqrt(p * p + q * q);
-                    p = p / r;
-                    q = q / r;
+                    p /= r;
+                    q /= r;
 
                     // Row modification
                     for (int j = iu - 1; j < n; j++) {
@@ -364,14 +363,12 @@ class SchurTransformer {
                 q = matrixT[k + 1][k - 1];
                 r = notlast ? matrixT[k + 2][k - 1] : 0.0;
                 shift.x = FastMath.abs(p) + FastMath.abs(q) + FastMath.abs(r);
-                if (!Precision.equals(shift.x, 0.0, epsilon)) {
-                    p = p / shift.x;
-                    q = q / shift.x;
-                    r = r / shift.x;
+                if (Precision.equals(shift.x, 0.0, epsilon)) {
+                    continue;
                 }
-            }
-            if (shift.x == 0.0) {
-                break;
+                p /= shift.x;
+                q /= shift.x;
+                r /= shift.x;
             }
             double s = FastMath.sqrt(p * p + q * q + r * r);
             if (p < 0.0) {
@@ -383,33 +380,33 @@ class SchurTransformer {
                 } else if (il != im) {
                     matrixT[k][k - 1] = -matrixT[k][k - 1];
                 }
-                p = p + s;
+                p += s;
                 shift.x = p / s;
                 shift.y = q / s;
                 double z = r / s;
-                q = q / p;
-                r = r / p;
+                q /= p;
+                r /= p;
 
                 // Row modification
                 for (int j = k; j < n; j++) {
                     p = matrixT[k][j] + q * matrixT[k + 1][j];
                     if (notlast) {
-                        p = p + r * matrixT[k + 2][j];
-                        matrixT[k + 2][j] = matrixT[k + 2][j] - p * z;
+                        p += r * matrixT[k + 2][j];
+                        matrixT[k + 2][j] -= p * z;
                     }
-                    matrixT[k][j] = matrixT[k][j] - p * shift.x;
-                    matrixT[k + 1][j] = matrixT[k + 1][j] - p * shift.y;
+                    matrixT[k][j] -= p * shift.x;
+                    matrixT[k + 1][j] -= p * shift.y;
                 }
 
                 // Column modification
                 for (int i = 0; i <= FastMath.min(iu, k + 3); i++) {
                     p = shift.x * matrixT[i][k] + shift.y * matrixT[i][k + 1];
                     if (notlast) {
-                        p = p + z * matrixT[i][k + 2];
-                        matrixT[i][k + 2] = matrixT[i][k + 2] - p * r;
+                        p += z * matrixT[i][k + 2];
+                        matrixT[i][k + 2] -= p * r;
                     }
-                    matrixT[i][k] = matrixT[i][k] - p;
-                    matrixT[i][k + 1] = matrixT[i][k + 1] - p * q;
+                    matrixT[i][k] -= p;
+                    matrixT[i][k + 1] -= p * q;
                 }
 
                 // Accumulate transformations
@@ -417,11 +414,11 @@ class SchurTransformer {
                 for (int i = 0; i <= high; i++) {
                     p = shift.x * matrixP[i][k] + shift.y * matrixP[i][k + 1];
                     if (notlast) {
-                        p = p + z * matrixP[i][k + 2];
-                        matrixP[i][k + 2] = matrixP[i][k + 2] - p * r;
+                        p += z * matrixP[i][k + 2];
+                        matrixP[i][k + 2] -= p * r;
                     }
-                    matrixP[i][k] = matrixP[i][k] - p;
-                    matrixP[i][k + 1] = matrixP[i][k + 1] - p * q;
+                    matrixP[i][k] -= p;
+                    matrixP[i][k + 1] -= p * q;
                 }
             }  // (s != 0)
         }  // k loop

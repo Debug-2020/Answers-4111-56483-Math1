@@ -32,7 +32,6 @@ import org.apache.commons.math3.util.FastMath;
  * implements Serializable since 2.0
  *
  * @since 1.1
- * @version $Id$
  */
 public class Fraction
     extends Number
@@ -83,6 +82,9 @@ public class Fraction
     /** Serializable version identifier */
     private static final long serialVersionUID = 3698073679419233275L;
 
+    /** The default epsilon used for convergence. */
+    private static final double DEFAULT_EPSILON = 1e-5;
+
     /** The denominator. */
     private final int denominator;
 
@@ -96,7 +98,7 @@ public class Fraction
      *         converge.
      */
     public Fraction(double value) throws FractionConversionException {
-        this(value, 1.0e-5, 100);
+        this(value, DEFAULT_EPSILON, 100);
     }
 
     /**
@@ -182,8 +184,7 @@ public class Fraction
             throw new FractionConversionException(value, a0, 1l);
         }
 
-        // check for (almost) integer arguments, which should not go
-        // to iterations.
+        // check for (almost) integer arguments, which should not go to iterations.
         if (FastMath.abs(a0 - value) < epsilon) {
             this.numerator = (int) a0;
             this.denominator = 1;
@@ -206,7 +207,13 @@ public class Fraction
             long a1 = (long)FastMath.floor(r1);
             p2 = (a1 * p1) + p0;
             q2 = (a1 * q1) + q0;
+
             if ((FastMath.abs(p2) > overflow) || (FastMath.abs(q2) > overflow)) {
+                // in maxDenominator mode, if the last fraction was very close to the actual value
+                // q2 may overflow in the next iteration; in this case return the last one.
+                if (epsilon == 0.0 && FastMath.abs(q1) < maxDenominator) {
+                    break;
+                }
                 throw new FractionConversionException(value, p2, q2);
             }
 
@@ -300,8 +307,8 @@ public class Fraction
     /**
      * Compares this object to another based on size.
      * @param object the object to compare to
-     * @return -1 if this is less than <tt>object</tt>, +1 if this is greater
-     *         than <tt>object</tt>, 0 if they are equal.
+     * @return -1 if this is less than {@code object}, +1 if this is greater
+     *         than {@code object}, 0 if they are equal.
      */
     public int compareTo(Fraction object) {
         long nOd = ((long) numerator) * object.denominator;
@@ -310,9 +317,9 @@ public class Fraction
     }
 
     /**
-     * Gets the fraction as a <tt>double</tt>. This calculates the fraction as
+     * Gets the fraction as a {@code double}. This calculates the fraction as
      * the numerator divided by denominator.
-     * @return the fraction as a <tt>double</tt>
+     * @return the fraction as a {@code double}
      */
     @Override
     public double doubleValue() {
@@ -325,7 +332,7 @@ public class Fraction
      * fractions are considered to be equal.
      * @param other fraction to test for equality to this fraction
      * @return true if two fractions are equal, false if object is
-     *         <tt>null</tt>, not an instance of {@link Fraction}, or not equal
+     *         {@code null}, not an instance of {@link Fraction}, or not equal
      *         to this fraction instance.
      */
     @Override
@@ -344,9 +351,9 @@ public class Fraction
     }
 
     /**
-     * Gets the fraction as a <tt>float</tt>. This calculates the fraction as
+     * Gets the fraction as a {@code float}. This calculates the fraction as
      * the numerator divided by denominator.
-     * @return the fraction as a <tt>float</tt>
+     * @return the fraction as a {@code float}
      */
     @Override
     public float floatValue() {
@@ -379,7 +386,7 @@ public class Fraction
     }
 
     /**
-     * Gets the fraction as an <tt>int</tt>. This returns the whole number part
+     * Gets the fraction as an {@code int}. This returns the whole number part
      * of the fraction.
      * @return the whole number fraction part
      */
@@ -389,7 +396,7 @@ public class Fraction
     }
 
     /**
-     * Gets the fraction as a <tt>long</tt>. This returns the whole number part
+     * Gets the fraction as a {@code long}. This returns the whole number part
      * of the fraction.
      * @return the whole number fraction part
      */
@@ -433,7 +440,7 @@ public class Fraction
 
     /**
      * Add an integer to the fraction.
-     * @param i the <tt>integer</tt> to add.
+     * @param i the {@code integer} to add.
      * @return this + i
      */
     public Fraction add(final int i) {
@@ -456,7 +463,7 @@ public class Fraction
 
     /**
      * Subtract an integer from the fraction.
-     * @param i the <tt>integer</tt> to subtract.
+     * @param i the {@code integer} to subtract.
      * @return this - i
      */
     public Fraction subtract(final int i) {
@@ -548,11 +555,11 @@ public class Fraction
 
     /**
      * Multiply the fraction by an integer.
-     * @param i the <tt>integer</tt> to multiply by.
+     * @param i the {@code integer} to multiply by.
      * @return this * i
      */
     public Fraction multiply(final int i) {
-        return new Fraction(numerator * i, denominator);
+        return multiply(new Fraction(i));
     }
 
     /**
@@ -578,20 +585,20 @@ public class Fraction
 
     /**
      * Divide the fraction by an integer.
-     * @param i the <tt>integer</tt> to divide by.
+     * @param i the {@code integer} to divide by.
      * @return this * i
      */
     public Fraction divide(final int i) {
-        return new Fraction(numerator, denominator * i);
+        return divide(new Fraction(i));
     }
 
     /**
      * <p>
-     * Gets the fraction percentage as a <tt>double</tt>. This calculates the
+     * Gets the fraction percentage as a {@code double}. This calculates the
      * fraction as the numerator divided by denominator multiplied by 100.
      * </p>
      *
-     * @return the fraction percentage as a <tt>double</tt>.
+     * @return the fraction percentage as a {@code double}.
      */
     public double percentageValue() {
         return 100 * doubleValue();

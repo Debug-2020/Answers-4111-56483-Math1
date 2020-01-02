@@ -26,7 +26,7 @@ import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.exception.MathInternalError;
 import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
-import org.apache.commons.math3.util.ArithmeticUtils;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.MathArrays;
 
@@ -71,8 +71,7 @@ import org.apache.commons.math3.util.MathArrays;
  * <p>This class is mainly used as the engine for scalar variable {@link DerivativeStructure}.
  * It can also be used directly to hold several variables in arrays for more complex data
  * structures. User can for example store a vector of n variables depending on three x, y
- * and z free parameters in one array as follows:
- * <pre>
+ * and z free parameters in one array as follows:</p> <pre>
  *   // parameter 0 is x, parameter 1 is y, parameter 2 is z
  *   int parameters = 3;
  *   DSCompiler compiler = DSCompiler.getCompiler(parameters, order);
@@ -80,7 +79,7 @@ import org.apache.commons.math3.util.MathArrays;
  *
  *   // pack all elements in a single array
  *   double[] array = new double[n * size];
- *   for (int i = 0; i < n; ++i) {
+ *   for (int i = 0; i &lt; n; ++i) {
  *
  *     // we know value is guaranteed to be the first element
  *     array[i * size] = v[i];
@@ -94,13 +93,12 @@ import org.apache.commons.math3.util.MathArrays;
  *
  *   }
  * </pre>
- * Then in another function, user can perform some operations on all elements stored
- * in the single array, such as a simple product of all variables:
- * <pre>
+ * <p>Then in another function, user can perform some operations on all elements stored
+ * in the single array, such as a simple product of all variables:</p> <pre>
  *   // compute the product of all elements
  *   double[] product = new double[size];
  *   prod[0] = 1.0;
- *   for (int i = 0; i < n; ++i) {
+ *   for (int i = 0; i &lt; n; ++i) {
  *     double[] tmp = product.clone();
  *     compiler.multiply(tmp, 0, array, i * size, product, 0);
  *   }
@@ -120,9 +118,8 @@ import org.apache.commons.math3.util.MathArrays;
  *   double dPdYdY = product[compiler.getPartialDerivativeIndex(0, 2, 0)];
  *   double dPdYdZ = product[compiler.getPartialDerivativeIndex(0, 1, 1)];
  *   double dPdZdZ = product[compiler.getPartialDerivativeIndex(0, 0, 2)];
- * </p>
+ * </pre>
  * @see DerivativeStructure
- * @version $Id$
  * @since 3.1
  */
 public class DSCompiler {
@@ -361,7 +358,7 @@ public class DSCompiler {
 
         for (int i = 0; i < dSize; ++i) {
             final int[][] dRow = derivativeCompiler.multIndirection[i];
-            List<int[]> row = new ArrayList<int[]>();
+            List<int[]> row = new ArrayList<int[]>(dRow.length * 2);
             for (int j = 0; j < dRow.length; ++j) {
                 row.add(new int[] { dRow[j][0], lowerIndirection[dRow[j][1]], vSize + dRow[j][2] });
                 row.add(new int[] { dRow[j][0], vSize + dRow[j][1], lowerIndirection[dRow[j][2]] });
@@ -832,6 +829,48 @@ public class DSCompiler {
         for (int i = 1; i < getSize(); ++i) {
             result[resultOffset + i] = lhs[lhsOffset + i] - k * rhs[rhsOffset + i];
         }
+
+    }
+
+    /** Compute power of a double to a derivative structure.
+     * @param a number to exponentiate
+     * @param operand array holding the power
+     * @param operandOffset offset of the power in its array
+     * @param result array where result must be stored (for
+     * power the result array <em>cannot</em> be the input
+     * array)
+     * @param resultOffset offset of the result in its array
+     * @since 3.3
+     */
+    public void pow(final double a,
+                    final double[] operand, final int operandOffset,
+                    final double[] result, final int resultOffset) {
+
+        // create the function value and derivatives
+        // [a^x, ln(a) a^x, ln(a)^2 a^x,, ln(a)^3 a^x, ... ]
+        final double[] function = new double[1 + order];
+        if (a == 0) {
+            if (operand[operandOffset] == 0) {
+                function[0] = 1;
+                double infinity = Double.POSITIVE_INFINITY;
+                for (int i = 1; i < function.length; ++i) {
+                    infinity = -infinity;
+                    function[i] = infinity;
+                }
+            } else if (operand[operandOffset] < 0) {
+                Arrays.fill(function, Double.NaN);
+            }
+        } else {
+            function[0] = FastMath.pow(a, operand[operandOffset]);
+            final double lnA = FastMath.log(a);
+            for (int i = 1; i < function.length; ++i) {
+                function[i] = lnA * function[i - 1];
+            }
+        }
+
+
+        // apply function composition
+        compose(operand, operandOffset, function, result, resultOffset);
 
     }
 
@@ -1752,7 +1791,7 @@ public class DSCompiler {
                 if (orders[k] > 0) {
                     try {
                         term *= FastMath.pow(delta[k], orders[k]) /
-                                ArithmeticUtils.factorial(orders[k]);
+                        CombinatoricsUtils.factorial(orders[k]);
                     } catch (NotPositiveException e) {
                         // this cannot happen
                         throw new MathInternalError(e);

@@ -19,18 +19,17 @@ package org.apache.commons.math3.distribution;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.ArithmeticUtils;
-import org.apache.commons.math3.util.ResizableDoubleArray;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
+import org.apache.commons.math3.util.CombinatoricsUtils;
+import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.ResizableDoubleArray;
 
 /**
  * Implementation of the exponential distribution.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Exponential_distribution">Exponential distribution (Wikipedia)</a>
  * @see <a href="http://mathworld.wolfram.com/ExponentialDistribution.html">Exponential distribution (MathWorld)</a>
- * @version $Id$
  */
 public class ExponentialDistribution extends AbstractRealDistribution {
     /**
@@ -56,6 +55,8 @@ public class ExponentialDistribution extends AbstractRealDistribution {
     private static final double[] EXPONENTIAL_SA_QI;
     /** The mean of this distribution. */
     private final double mean;
+    /** The logarithm of the mean, stored to reduce computing time. **/
+    private final double logMean;
     /** Inverse cumulative probability accuracy. */
     private final double solverAbsoluteAccuracy;
 
@@ -80,7 +81,7 @@ public class ExponentialDistribution extends AbstractRealDistribution {
         final ResizableDoubleArray ra = new ResizableDoubleArray(20);
 
         while (qi < 1) {
-            qi += FastMath.pow(LN2, i) / ArithmeticUtils.factorial(i);
+            qi += FastMath.pow(LN2, i) / CombinatoricsUtils.factorial(i);
             ra.addElement(qi);
             ++i;
         }
@@ -90,6 +91,14 @@ public class ExponentialDistribution extends AbstractRealDistribution {
 
     /**
      * Create an exponential distribution with the given mean.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
+     *
      * @param mean mean of this distribution.
      */
     public ExponentialDistribution(double mean) {
@@ -98,6 +107,13 @@ public class ExponentialDistribution extends AbstractRealDistribution {
 
     /**
      * Create an exponential distribution with the given mean.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param mean Mean of this distribution.
      * @param inverseCumAccuracy Maximum absolute error in inverse
@@ -108,6 +124,19 @@ public class ExponentialDistribution extends AbstractRealDistribution {
      */
     public ExponentialDistribution(double mean, double inverseCumAccuracy) {
         this(new Well19937c(), mean, inverseCumAccuracy);
+    }
+
+    /**
+     * Creates an exponential distribution.
+     *
+     * @param rng Random number generator.
+     * @param mean Mean of this distribution.
+     * @throws NotStrictlyPositiveException if {@code mean <= 0}.
+     * @since 3.3
+     */
+    public ExponentialDistribution(RandomGenerator rng, double mean)
+        throws NotStrictlyPositiveException {
+        this(rng, mean, DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
     }
 
     /**
@@ -131,6 +160,7 @@ public class ExponentialDistribution extends AbstractRealDistribution {
             throw new NotStrictlyPositiveException(LocalizedFormats.MEAN, mean);
         }
         this.mean = mean;
+        logMean = FastMath.log(mean);
         solverAbsoluteAccuracy = inverseCumAccuracy;
     }
 
@@ -145,10 +175,17 @@ public class ExponentialDistribution extends AbstractRealDistribution {
 
     /** {@inheritDoc} */
     public double density(double x) {
+        final double logDensity = logDensity(x);
+        return logDensity == Double.NEGATIVE_INFINITY ? 0 : FastMath.exp(logDensity);
+    }
+
+    /** {@inheritDoc} **/
+    @Override
+    public double logDensity(double x) {
         if (x < 0) {
-            return 0;
+            return Double.NEGATIVE_INFINITY;
         }
-        return FastMath.exp(-x / mean) / mean;
+        return -x / mean - logMean;
     }
 
     /**

@@ -19,11 +19,11 @@ package org.apache.commons.math3.distribution;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.special.Beta;
-import org.apache.commons.math3.util.ArithmeticUtils;
-import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
+import org.apache.commons.math3.special.Beta;
+import org.apache.commons.math3.util.CombinatoricsUtils;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * <p>
@@ -58,7 +58,6 @@ import org.apache.commons.math3.random.Well19937c;
  * Negative binomial distribution (Wikipedia)</a>
  * @see <a href="http://mathworld.wolfram.com/NegativeBinomialDistribution.html">
  * Negative binomial distribution (MathWorld)</a>
- * @version $Id$
  * @since 1.2 (changed to concrete class in 3.0)
  */
 public class PascalDistribution extends AbstractIntegerDistribution {
@@ -68,10 +67,23 @@ public class PascalDistribution extends AbstractIntegerDistribution {
     private final int numberOfSuccesses;
     /** The probability of success. */
     private final double probabilityOfSuccess;
+    /** The value of {@code log(p)}, where {@code p} is the probability of success,
+     * stored for faster computation. */
+    private final double logProbabilityOfSuccess;
+    /** The value of {@code log(1-p)}, where {@code p} is the probability of success,
+     * stored for faster computation. */
+    private final double log1mProbabilityOfSuccess;
 
     /**
      * Create a Pascal distribution with the given number of successes and
      * probability of success.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param r Number of successes.
      * @param p Probability of success.
@@ -112,6 +124,8 @@ public class PascalDistribution extends AbstractIntegerDistribution {
 
         numberOfSuccesses = r;
         probabilityOfSuccess = p;
+        logProbabilityOfSuccess = FastMath.log(p);
+        log1mProbabilityOfSuccess = FastMath.log1p(-p);
     }
 
     /**
@@ -138,10 +152,25 @@ public class PascalDistribution extends AbstractIntegerDistribution {
         if (x < 0) {
             ret = 0.0;
         } else {
-            ret = ArithmeticUtils.binomialCoefficientDouble(x +
+            ret = CombinatoricsUtils.binomialCoefficientDouble(x +
                   numberOfSuccesses - 1, numberOfSuccesses - 1) *
                   FastMath.pow(probabilityOfSuccess, numberOfSuccesses) *
                   FastMath.pow(1.0 - probabilityOfSuccess, x);
+        }
+        return ret;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double logProbability(int x) {
+        double ret;
+        if (x < 0) {
+            ret = Double.NEGATIVE_INFINITY;
+        } else {
+            ret = CombinatoricsUtils.binomialCoefficientLog(x +
+                  numberOfSuccesses - 1, numberOfSuccesses - 1) +
+                  logProbabilityOfSuccess * numberOfSuccesses +
+                  log1mProbabilityOfSuccess * x;
         }
         return ret;
     }

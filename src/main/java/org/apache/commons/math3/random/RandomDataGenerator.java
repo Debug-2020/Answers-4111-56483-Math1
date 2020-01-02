@@ -108,7 +108,6 @@ import org.apache.commons.math3.util.MathArrays;
  * </ul>
  * </p>
  * @since 3.1
- * @version $Id$
  */
 public class RandomDataGenerator implements RandomData, Serializable {
 
@@ -226,14 +225,14 @@ public class RandomDataGenerator implements RandomData, Serializable {
     }
 
     /**
-     * Returns a pseudorandom, uniformly distributed <tt>long</tt> value
+     * Returns a pseudorandom, uniformly distributed {@code long} value
      * between 0 (inclusive) and the specified value (exclusive), drawn from
      * this random number generator's sequence.
      *
      * @param rng random generator to use
      * @param n the bound on the random number to be returned.  Must be
      * positive.
-     * @return  a pseudorandom, uniformly distributed <tt>long</tt>
+     * @return  a pseudorandom, uniformly distributed {@code long}
      * value between 0 (inclusive) and n (exclusive).
      * @throws IllegalArgumentException  if n is not positive.
      */
@@ -248,7 +247,7 @@ public class RandomDataGenerator implements RandomData, Serializable {
                 for (final byte b : byteArray) {
                     bits = (bits << 8) | (((long) b) & 0xffL);
                 }
-                bits = bits & 0x7fffffffffffffffL;
+                bits &= 0x7fffffffffffffffL;
                 val  = bits % n;
             } while (bits - val + (n - 1) < 0);
             return val;
@@ -620,11 +619,10 @@ public class RandomDataGenerator implements RandomData, Serializable {
     /**
      * {@inheritDoc}
      *
-     * <p>
-     * Uses a 2-cycle permutation shuffle. The shuffling process is described <a
-     * href="http://www.maths.abdn.ac.uk/~igc/tch/mx4002/notes/node83.html">
-     * here</a>.
-     * </p>
+     * This method calls {@link MathArrays#shuffle(int[],RandomGenerator)
+     * MathArrays.shuffle} in order to create a random shuffle of the set
+     * of natural numbers {@code { 0, 1, ..., n - 1 }}.
+     *
      * @throws NumberIsTooLargeException if {@code k > n}.
      * @throws NotStrictlyPositiveException if {@code k <= 0}.
      */
@@ -639,7 +637,7 @@ public class RandomDataGenerator implements RandomData, Serializable {
                                                    k);
         }
 
-        int[] index = getNatural(n);
+        int[] index = MathArrays.natural(n);
         MathArrays.shuffle(index, getRandomGenerator());
 
         // Return a new array containing the first "k" entries of "index".
@@ -649,15 +647,8 @@ public class RandomDataGenerator implements RandomData, Serializable {
     /**
      * {@inheritDoc}
      *
-     * <p>
-     * <strong>Algorithm Description</strong>: Uses a 2-cycle permutation
-     * shuffle to generate a random permutation of <code>c.size()</code> and
-     * then returns the elements whose indexes correspond to the elements of the
-     * generated permutation. This technique is described, and proven to
-     * generate random samples <a
-     * href="http://www.maths.abdn.ac.uk/~igc/tch/mx4002/notes/node83.html">
-     * here</a>
-     * </p>
+     * This method calls {@link #nextPermutation(int,int) nextPermutation(c.size(), k)}
+     * in order to sample the collection.
      */
     public Object[] nextSample(Collection<?> c, int k) throws NumberIsTooLargeException, NotStrictlyPositiveException {
 
@@ -787,41 +778,5 @@ public class RandomDataGenerator implements RandomData, Serializable {
             secRand.setSeed(System.currentTimeMillis() + System.identityHashCode(this));
         }
         return secRand;
-    }
-
-    /**
-     * Uses a 2-cycle permutation shuffle to randomly re-order the last elements
-     * of list.
-     *
-     * @param list list to be shuffled
-     * @param end element past which shuffling begins
-     */
-    private void shuffle(int[] list, int end) {
-        int target = 0;
-        for (int i = list.length - 1; i >= end; i--) {
-            if (i == 0) {
-                target = 0;
-            } else {
-                // NumberIsTooLargeException cannot occur
-                target = nextInt(0, i);
-            }
-            int temp = list[target];
-            list[target] = list[i];
-            list[i] = temp;
-        }
-    }
-
-    /**
-     * Returns an array representing n.
-     *
-     * @param n the natural number to represent
-     * @return array with entries = elements of n
-     */
-    private int[] getNatural(int n) {
-        int[] natural = new int[n];
-        for (int i = 0; i < n; i++) {
-            natural[i] = i;
-        }
-        return natural;
     }
 }

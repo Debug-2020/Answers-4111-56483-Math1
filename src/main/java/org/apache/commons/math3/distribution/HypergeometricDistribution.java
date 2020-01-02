@@ -21,16 +21,15 @@ import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Implementation of the hypergeometric distribution.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Hypergeometric_distribution">Hypergeometric distribution (Wikipedia)</a>
  * @see <a href="http://mathworld.wolfram.com/HypergeometricDistribution.html">Hypergeometric distribution (MathWorld)</a>
- * @version $Id$
  */
 public class HypergeometricDistribution extends AbstractIntegerDistribution {
     /** Serializable version identifier. */
@@ -49,6 +48,13 @@ public class HypergeometricDistribution extends AbstractIntegerDistribution {
     /**
      * Construct a new hypergeometric distribution with the specified population
      * size, number of successes in the population, and sample size.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param populationSize Population size.
      * @param numberOfSuccesses Number of successes in the population.
@@ -193,22 +199,29 @@ public class HypergeometricDistribution extends AbstractIntegerDistribution {
 
     /** {@inheritDoc} */
     public double probability(int x) {
+        final double logProbability = logProbability(x);
+        return logProbability == Double.NEGATIVE_INFINITY ? 0 : FastMath.exp(logProbability);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public double logProbability(int x) {
         double ret;
 
         int[] domain = getDomain(populationSize, numberOfSuccesses, sampleSize);
         if (x < domain[0] || x > domain[1]) {
-            ret = 0.0;
+            ret = Double.NEGATIVE_INFINITY;
         } else {
             double p = (double) sampleSize / (double) populationSize;
             double q = (double) (populationSize - sampleSize) / (double) populationSize;
             double p1 = SaddlePointExpansion.logBinomialProbability(x,
                     numberOfSuccesses, p, q);
             double p2 =
-                SaddlePointExpansion.logBinomialProbability(sampleSize - x,
-                    populationSize - numberOfSuccesses, p, q);
+                    SaddlePointExpansion.logBinomialProbability(sampleSize - x,
+                            populationSize - numberOfSuccesses, p, q);
             double p3 =
-                SaddlePointExpansion.logBinomialProbability(sampleSize, populationSize, p, q);
-            ret = FastMath.exp(p1 + p2 - p3);
+                    SaddlePointExpansion.logBinomialProbability(sampleSize, populationSize, p, q);
+            ret = p1 + p2 - p3;
         }
 
         return ret;
@@ -265,7 +278,7 @@ public class HypergeometricDistribution extends AbstractIntegerDistribution {
      * size {@code n}, the mean is {@code n * m / N}.
      */
     public double getNumericalMean() {
-        return (double) (getSampleSize() * getNumberOfSuccesses()) / (double) getPopulationSize();
+        return getSampleSize() * (getNumberOfSuccesses() / (double) getPopulationSize());
     }
 
     /**

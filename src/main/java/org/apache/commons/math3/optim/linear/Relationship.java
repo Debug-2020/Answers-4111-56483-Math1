@@ -19,7 +19,6 @@ package org.apache.commons.math3.optim.linear;
 /**
  * Types of relationships between two cells in a Solver {@link LinearConstraint}.
  *
- * @version $Id$
  * @since 2.0
  */
 public enum Relationship {
@@ -38,10 +37,11 @@ public enum Relationship {
      *
      * @param stringValue Display string for the relationship.
      */
-    private Relationship(String stringValue) {
+    Relationship(String stringValue) {
         this.stringValue = stringValue;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return stringValue;

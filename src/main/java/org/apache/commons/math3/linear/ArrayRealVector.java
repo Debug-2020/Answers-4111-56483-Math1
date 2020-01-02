@@ -33,7 +33,6 @@ import org.apache.commons.math3.util.FastMath;
 
 /**
  * This class implements the {@link RealVector} interface with a double array.
- * @version $Id$
  * @since 2.0
  */
 public class ArrayRealVector extends RealVector implements Serializable {
@@ -360,7 +359,7 @@ public class ArrayRealVector extends RealVector implements Serializable {
     @Override
     public RealVector mapAddToSelf(double d) {
         for (int i = 0; i < data.length; i++) {
-            data[i] = data[i] + d;
+            data[i] += d;
         }
         return this;
     }
@@ -369,7 +368,7 @@ public class ArrayRealVector extends RealVector implements Serializable {
     @Override
     public RealVector mapSubtractToSelf(double d) {
         for (int i = 0; i < data.length; i++) {
-            data[i] = data[i] - d;
+            data[i] -= d;
         }
         return this;
     }
@@ -378,7 +377,7 @@ public class ArrayRealVector extends RealVector implements Serializable {
     @Override
     public RealVector mapMultiplyToSelf(double d) {
         for (int i = 0; i < data.length; i++) {
-            data[i] = data[i] * d;
+            data[i] *= d;
         }
         return this;
     }
@@ -387,7 +386,7 @@ public class ArrayRealVector extends RealVector implements Serializable {
     @Override
     public RealVector mapDivideToSelf(double d) {
         for (int i = 0; i < data.length; i++) {
-            data[i] = data[i] / d;
+            data[i] /= d;
         }
         return this;
     }

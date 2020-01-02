@@ -33,7 +33,6 @@ import org.apache.commons.math3.optim.PointValuePair;
  * turn with different starting points (trying to avoid being trapped
  * in a local extremum when looking for a global one).
  *
- * @version $Id$
  * @since 3.0
  */
 public class MultiStartMultivariateOptimizer
@@ -94,6 +93,7 @@ public class MultiStartMultivariateOptimizer
      */
     private Comparator<PointValuePair> getPairComparator() {
         return new Comparator<PointValuePair>() {
+            /** {@inheritDoc} */
             public int compare(final PointValuePair o1,
                                final PointValuePair o2) {
                 if (o1 == null) {

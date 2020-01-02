@@ -28,7 +28,6 @@ package org.apache.commons.math3.random;
  * are in <a href="http://www.iro.umontreal.ca/~lecuyer/myftp/papers/wellrng-errata.txt">wellrng-errata.txt</a>.</p>
 
  * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">WELL Random number generator</a>
- * @version $Id$
  * @since 2.2
 
  */
@@ -105,8 +104,8 @@ public class Well19937c extends AbstractWell {
 
         // add Matsumoto-Kurita tempering
         // to get a maximally-equidistributed generator
-        z4 = z4 ^ ((z4 <<  7) & 0xe46e1700);
-        z4 = z4 ^ ((z4 << 15) & 0x9b868000);
+        z4 ^= (z4 <<  7) & 0xe46e1700;
+        z4 ^= (z4 << 15) & 0x9b868000;
 
         return z4 >>> (32 - bits);
 

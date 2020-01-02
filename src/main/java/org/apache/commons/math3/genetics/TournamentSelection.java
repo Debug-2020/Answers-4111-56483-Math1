@@ -29,7 +29,6 @@ import org.apache.commons.math3.exception.util.LocalizedFormats;
  * fittest chromosome among them.
  *
  * @since 2.0
- * @version $Id$
  */
 public class TournamentSelection implements SelectionPolicy {
 
@@ -64,7 +63,7 @@ public class TournamentSelection implements SelectionPolicy {
      * Helper for {@link #select(Population)}. Draw {@link #arity} random chromosomes without replacement from the
      * population, and then select the fittest chromosome among them.
      *
-     * @param population the population from which the chromosomes are choosen.
+     * @param population the population from which the chromosomes are chosen.
      * @return the selected chromosome.
      * @throws MathIllegalArgumentException if the tournament arity is bigger than the population size
      */
@@ -75,6 +74,7 @@ public class TournamentSelection implements SelectionPolicy {
         }
         // auxiliary population
         ListPopulation tournamentPopulation = new ListPopulation(this.arity) {
+            /** {@inheritDoc} */
             public Population nextGeneration() {
                 // not useful here
                 return null;

@@ -18,9 +18,9 @@ package org.apache.commons.math3.analysis.differentiation;
 
 import java.io.Serializable;
 
-import org.apache.commons.math3.RealFieldElement;
 import org.apache.commons.math3.Field;
 import org.apache.commons.math3.FieldElement;
+import org.apache.commons.math3.RealFieldElement;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
@@ -34,7 +34,7 @@ import org.apache.commons.math3.util.MathUtils;
  * numbers described in Dan Kalman's paper <a
  * href="http://www1.american.edu/cas/mathstat/People/kalman/pdffiles/mmgautodiff.pdf">Doubly
  * Recursive Multivariate Automatic Differentiation</a>, Mathematics Magazine, vol. 75,
- * no. 3, June 2002.</p>. Rall's numbers are an extension to the real numbers used
+ * no. 3, June 2002. Rall's numbers are an extension to the real numbers used
  * throughout mathematical expressions; they hold the derivative together with the
  * value of a function. Dan Kalman's derivative structures hold all partial derivatives
  * up to any specified order, with respect to any number of free parameters. Rall's
@@ -56,7 +56,6 @@ import org.apache.commons.math3.util.MathUtils;
  * differentiator}.</p>
  * <p>Instances of this class are guaranteed to be immutable.</p>
  * @see DSCompiler
- * @version $Id$
  * @since 3.1
  */
 public class DerivativeStructure implements RealFieldElement<DerivativeStructure>, Serializable {
@@ -230,6 +229,20 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
      */
     public int getOrder() {
         return compiler.getOrder();
+    }
+
+    /** Create a constant compatible with instance order and number of parameters.
+     * <p>
+     * This method is a convenience factory method, it simply calls
+     * {@code new DerivativeStructure(getFreeParameters(), getOrder(), c)}
+     * </p>
+     * @param c value of the constant
+     * @return a constant compatible with instance order and number of parameters
+     * @see #DerivativeStructure(int, int, double)
+     * @since 3.3
+     */
+    public DerivativeStructure createConstant(final double c) {
+        return new DerivativeStructure(getFreeParameters(), getOrder(), c);
     }
 
     /** {@inheritDoc}
@@ -541,7 +554,7 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
 
     /**
      * Returns the hypotenuse of a triangle with sides {@code x} and {@code y}
-     * - sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)<br/>
+     * - sqrt(<i>x</i><sup>2</sup>&nbsp;+<i>y</i><sup>2</sup>)
      * avoiding intermediate overflow or underflow.
      *
      * <ul>
@@ -629,6 +642,18 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
             }
 
         };
+    }
+
+    /** Compute a<sup>x</sup> where a is a double and x a {@link DerivativeStructure}
+     * @param a number to exponentiate
+     * @param x power to apply
+     * @return a<sup>x</sup>
+     * @since 3.3
+     */
+    public static DerivativeStructure pow(final double a, final DerivativeStructure x) {
+        final DerivativeStructure result = new DerivativeStructure(x.compiler);
+        x.compiler.pow(a, x.data, 0, result.data, 0);
+        return result;
     }
 
     /** {@inheritDoc}
@@ -1152,7 +1177,7 @@ public class DerivativeStructure implements RealFieldElement<DerivativeStructure
          * @param order derivation order
          * @param data partial derivatives
          */
-        public DataTransferObject(final int variables, final int order, final double[] data) {
+        DataTransferObject(final int variables, final int order, final double[] data) {
             this.variables = variables;
             this.order     = order;
             this.data      = data;

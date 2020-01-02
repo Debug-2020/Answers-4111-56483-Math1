@@ -22,6 +22,7 @@ import java.text.ParsePosition;
 
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.exception.NullArgumentException;
+import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.MathUtils;
 
 /**
@@ -33,7 +34,6 @@ import org.apache.commons.math3.util.MathUtils;
  * will result in a <code>ParseException</code>.</p>
  *
  * @since 1.1
- * @version $Id$
  */
 public class ProperFractionFormat extends FractionFormat {
 
@@ -96,17 +96,16 @@ public class ProperFractionFormat extends FractionFormat {
         int num = fraction.getNumerator();
         int den = fraction.getDenominator();
         int whole = num / den;
-        num = num % den;
+        num %= den;
 
         if (whole != 0) {
             getWholeFormat().format(whole, toAppendTo, pos);
             toAppendTo.append(' ');
-            num = Math.abs(num);
+            num = FastMath.abs(num);
         }
         getNumeratorFormat().format(num, toAppendTo, pos);
         toAppendTo.append(" / ");
-        getDenominatorFormat().format(den, toAppendTo,
-            pos);
+        getDenominatorFormat().format(den, toAppendTo, pos);
 
         return toAppendTo;
     }
@@ -215,7 +214,7 @@ public class ProperFractionFormat extends FractionFormat {
         int w = whole.intValue();
         int n = num.intValue();
         int d = den.intValue();
-        return new Fraction(((Math.abs(w) * d) + n) * MathUtils.copySign(1, w), d);
+        return new Fraction(((FastMath.abs(w) * d) + n) * MathUtils.copySign(1, w), d);
     }
 
     /**

@@ -48,7 +48,6 @@ import org.apache.commons.math3.util.FastMath;
  * between spherical and Cartesian coordinates.
  * </p>
  * @since 3.2
- * @version $Id$
  */
 public class SphericalCoordinates implements Serializable {
 
@@ -378,7 +377,7 @@ public class SphericalCoordinates implements Serializable {
          * @param y ordinate
          * @param z height
          */
-        public DataTransferObject(final double x, final double y, final double z) {
+        DataTransferObject(final double x, final double y, final double z) {
             this.x = x;
             this.y = y;
             this.z = z;

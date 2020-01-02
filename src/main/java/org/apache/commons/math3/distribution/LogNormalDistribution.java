@@ -20,10 +20,10 @@ package org.apache.commons.math3.distribution;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.special.Erf;
-import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
+import org.apache.commons.math3.special.Erf;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Implementation of the log-normal (gaussian) distribution.
@@ -50,7 +50,6 @@ import org.apache.commons.math3.random.Well19937c;
  * @see <a href="http://mathworld.wolfram.com/LogNormalDistribution.html">
  * Log Normal distribution (MathWorld)</a>
  *
- * @version $Id$
  * @since 3.0
  */
 public class LogNormalDistribution extends AbstractRealDistribution {
@@ -71,6 +70,8 @@ public class LogNormalDistribution extends AbstractRealDistribution {
 
     /** The shape parameter of this distribution. */
     private final double shape;
+    /** The value of {@code log(shape) + 0.5 * log(2*PI)} stored for faster computation. */
+    private final double logShapePlusHalfLog2Pi;
 
     /** Inverse cumulative probability accuracy. */
     private final double solverAbsoluteAccuracy;
@@ -81,6 +82,13 @@ public class LogNormalDistribution extends AbstractRealDistribution {
      * logarithm of the log-normal distribution are equal to zero and one
      * respectively. In other words, the scale of the returned distribution is
      * {@code 0}, while its shape is {@code 1}.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      */
     public LogNormalDistribution() {
         this(0, 1);
@@ -88,6 +96,13 @@ public class LogNormalDistribution extends AbstractRealDistribution {
 
     /**
      * Create a log-normal distribution using the specified scale and shape.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param scale the scale parameter of this distribution
      * @param shape the shape parameter of this distribution
@@ -101,6 +116,13 @@ public class LogNormalDistribution extends AbstractRealDistribution {
     /**
      * Create a log-normal distribution using the specified scale, shape and
      * inverse cumulative distribution accuracy.
+     * <p>
+     * <b>Note:</b> this constructor will implicitly create an instance of
+     * {@link Well19937c} as random generator to be used for sampling only (see
+     * {@link #sample()} and {@link #sample(int)}). In case no sampling is
+     * needed for the created distribution, it is advised to pass {@code null}
+     * as random generator via the appropriate constructors to avoid the
+     * additional initialisation overhead.
      *
      * @param scale the scale parameter of this distribution
      * @param shape the shape parameter of this distribution
@@ -110,6 +132,20 @@ public class LogNormalDistribution extends AbstractRealDistribution {
     public LogNormalDistribution(double scale, double shape, double inverseCumAccuracy)
         throws NotStrictlyPositiveException {
         this(new Well19937c(), scale, shape, inverseCumAccuracy);
+    }
+
+    /**
+     * Creates a log-normal distribution.
+     *
+     * @param rng Random number generator.
+     * @param scale Scale parameter of this distribution.
+     * @param shape Shape parameter of this distribution.
+     * @throws NotStrictlyPositiveException if {@code shape <= 0}.
+     * @since 3.3
+     */
+    public LogNormalDistribution(RandomGenerator rng, double scale, double shape)
+        throws NotStrictlyPositiveException {
+        this(rng, scale, shape, DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
     }
 
     /**
@@ -135,6 +171,7 @@ public class LogNormalDistribution extends AbstractRealDistribution {
 
         this.scale = scale;
         this.shape = shape;
+        this.logShapePlusHalfLog2Pi = FastMath.log(shape) + 0.5 * FastMath.log(2 * FastMath.PI);
         this.solverAbsoluteAccuracy = inverseCumAccuracy;
     }
 
@@ -174,6 +211,21 @@ public class LogNormalDistribution extends AbstractRealDistribution {
         final double x0 = FastMath.log(x) - scale;
         final double x1 = x0 / shape;
         return FastMath.exp(-0.5 * x1 * x1) / (shape * SQRT2PI * x);
+    }
+
+    /** {@inheritDoc}
+     *
+     * See documentation of {@link #density(double)} for computation details.
+     */
+    @Override
+    public double logDensity(double x) {
+        if (x <= 0) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        final double logX = FastMath.log(x);
+        final double x0 = logX - scale;
+        final double x1 = x0 / shape;
+        return -0.5 * x1 * x1 - (logShapePlusHalfLog2Pi + logX);
     }
 
     /**
@@ -257,7 +309,7 @@ public class LogNormalDistribution extends AbstractRealDistribution {
     public double getNumericalVariance() {
         final double s = shape;
         final double ss = s * s;
-        return (FastMath.exp(ss) - 1) * FastMath.exp(2 * scale + ss);
+        return (FastMath.expm1(ss)) * FastMath.exp(2 * scale + ss);
     }
 
     /**

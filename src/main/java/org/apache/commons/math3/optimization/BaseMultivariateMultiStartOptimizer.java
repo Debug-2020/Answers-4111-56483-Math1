@@ -37,7 +37,6 @@ import org.apache.commons.math3.random.RandomVectorGenerator;
  *
  * @param <FUNC> Type of the objective function to be optimized.
  *
- * @version $Id$
  * @deprecated As of 3.1 (to be removed in 4.0).
  * @since 3.0
  */
@@ -176,6 +175,7 @@ public class BaseMultivariateMultiStartOptimizer<FUNC extends MultivariateFuncti
      */
     private void sortPairs(final GoalType goal) {
         Arrays.sort(optima, new Comparator<PointValuePair>() {
+                /** {@inheritDoc} */
                 public int compare(final PointValuePair o1,
                                    final PointValuePair o2) {
                     if (o1 == null) {

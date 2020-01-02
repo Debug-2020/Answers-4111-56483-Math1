@@ -16,7 +16,7 @@
  */
 package org.apache.commons.math3.geometry.partitioning;
 
-import org.apache.commons.math3.geometry.Vector;
+import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.Space;
 
 /** This interface represents an hyperplane of a space.
@@ -30,9 +30,15 @@ import org.apache.commons.math3.geometry.Space;
  * space). They can be more exotic objects in specific fields, for
  * example a circle on the surface of the unit sphere.</p>
 
+ * <p>
+ * Note that this interface is <em>not</em> intended to be implemented
+ * by Apache Commons Math users, it is only intended to be implemented
+ * within the library itself. New methods may be added even for minor
+ * versions, which breaks compatibility for external implementations.
+ * </p>
+
  * @param <S> Type of the space.
 
- * @version $Id$
  * @since 3.0
  */
 public interface Hyperplane<S extends Space> {
@@ -53,7 +59,20 @@ public interface Hyperplane<S extends Space> {
      * @param point point to check
      * @return offset of the point
      */
-    double getOffset(Vector<S> point);
+    double getOffset(Point<S> point);
+
+    /** Project a point to the hyperplane.
+     * @param point point to project
+     * @return projected point
+     * @since 3.3
+     */
+    Point<S> project(Point<S> point);
+
+    /** Get the tolerance below which points are considered to belong to the hyperplane.
+     * @return tolerance below which points are considered to belong to the hyperplane
+     * @since 3.3
+     */
+    double getTolerance();
 
     /** Check if the instance has the same orientation as another hyperplane.
      * <p>This method is expected to be called on parallel hyperplanes. The
